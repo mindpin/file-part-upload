@@ -24,5 +24,9 @@ module FilePartUpload
       FileUtils.mkdir_p(File.dirname(new_path))
       FileUtils.cp(self.path, new_path)
     end
+
+    def content_type
+      Util.mime_type(name)
+    end
   end
 end

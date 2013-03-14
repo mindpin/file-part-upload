@@ -272,7 +272,6 @@ describe FilePartUpload::Base do
 
   describe '模仿 rails 表单 一次上传整个文件' do
     before(:all){
-      file_name = File.basename(@image_path)
       @file_size = File.size(@image_path)
       image_file = File.new(@image_path)
       @image = ActionDispatch::Http::UploadedFile.new({
@@ -304,6 +303,25 @@ describe FilePartUpload::Base do
 
     it{
       @file_entity.attach.content_type.should == "image/jpeg"
+    }
+  end
+
+  describe '文件没有扩展名' do
+    before(:all){
+      image_file = File.new(File.join(@data_path,'1/image'))
+
+      @image = ActionDispatch::Http::UploadedFile.new({
+          :filename => 'image',
+          :type => '',
+          :tempfile => image_file
+      })
+
+      @file_entity = FileEntity.new(:attach => @image)
+      @file_entity.save
+    }
+
+    it{
+      @file_entity.attach_content_type.should == 'application/octet-stream'
     }
   end
 end

@@ -6,10 +6,7 @@ module FilePartUpload
       base.before_save do
         if @upload_file.present?
           self.attach_file_name = @upload_file.name
-
-          self.attach_content_type = MIME::Types.
-            type_for(self.attach_file_name).first.content_type
-
+          self.attach_content_type = @upload_file.content_type
           self.attach_file_size = @upload_file.size 
           self.saved_size = @upload_file.size
           self.merged = true
@@ -55,8 +52,7 @@ module FilePartUpload
 
     def check_status
       return if self.saved_size != self.attach_file_size
-      attach_content_type = MIME::Types.
-            type_for(self.attach_file_name).first.content_type
+      attach_content_type = Util.mime_type(self.attach_file_name)
 
       self.update_attributes( 
                               :merged => true,
