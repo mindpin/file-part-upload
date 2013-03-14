@@ -59,6 +59,13 @@ describe FilePartUpload::Base do
 
       it{
         File.exists?(@file_entity.attach.path).should == true
+        path = File.join(FilePartUpload.root, "file_part_upload/file_entities/#{@file_entity.id}/attach/image.jpg")
+        @file_entity.attach.path.should == path
+      }
+
+      it{
+        url = File.join("/file_part_upload/file_entities/#{@file_entity.id}/attach/image.jpg")
+        @file_entity.attach.url.should == url
       }
 
       it{
@@ -324,4 +331,5 @@ describe FilePartUpload::Base do
       @file_entity.attach_content_type.should == 'application/octet-stream'
     }
   end
+
 end

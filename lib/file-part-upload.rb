@@ -12,8 +12,13 @@ module FilePartUpload
   module Base
     extend ActiveSupport::Concern
     module ClassMethods
-      def file_part_upload
+      def file_part_upload(config = {})
+        self.class_variable_set(:@@file_part_upload_config, config) 
         self.send(:include, FilePartUpload::Instance) 
+      end
+
+      def file_part_upload_config
+        self.class_variable_get(:@@file_part_upload_config)
       end
     end
   end
