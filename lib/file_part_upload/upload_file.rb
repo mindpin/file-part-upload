@@ -9,7 +9,11 @@ module FilePartUpload
     end
 
     def name
-      File.basename(@file.path)
+      if @file.respond_to?(:original_filename)
+        @file.original_filename
+      else
+        File.basename(@file.path)
+      end
     end
 
     def size

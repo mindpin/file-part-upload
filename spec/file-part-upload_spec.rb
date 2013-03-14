@@ -52,7 +52,7 @@ describe FilePartUpload::Base do
       }
 
       it{
-        @file_entity.save_first_blob(@blob)
+        @file_entity.save_blob(@blob)
         @file_entity.uploaded?.should == true
         @file_entity.uploading?.should == false
       }
@@ -91,13 +91,13 @@ describe FilePartUpload::Base do
       }
 
       it{
-        @file_entity.save_first_blob(@blob_1)
+        @file_entity.save_blob(@blob_1)
         @file_entity.uploaded?.should == false
         @file_entity.uploading?.should == true
       }
 
       it{
-        @file_entity.save_new_blob(@blob_2)
+        @file_entity.save_blob(@blob_2)
         @file_entity.uploaded?.should == true
         @file_entity.uploading?.should == false
       }
@@ -137,19 +137,19 @@ describe FilePartUpload::Base do
       }
 
       it{
-        @file_entity.save_first_blob(@blob_1)
+        @file_entity.save_blob(@blob_1)
         @file_entity.uploaded?.should == false
         @file_entity.uploading?.should == true
       }
 
       it{
-        @file_entity.save_new_blob(@blob_2)
+        @file_entity.save_blob(@blob_2)
         @file_entity.uploaded?.should == false
         @file_entity.uploading?.should == true
       }
 
       it{
-        @file_entity.save_new_blob(@blob_3)
+        @file_entity.save_blob(@blob_3)
         @file_entity.uploaded?.should == true
         @file_entity.uploading?.should == false
       }
@@ -166,6 +166,77 @@ describe FilePartUpload::Base do
         @file_entity.attach.content_type.should == "image/jpeg"
       }
     end
+
+    describe '模仿 rails 表单上传' do
+      before(:all){
+        file_name = File.basename(@image_path)
+        @file_size = File.size(@image_path)
+        @file_blob_1 = File.new(File.join(@data_path,'3/image_split_aa'))
+        @file_blob_2 = File.new(File.join(@data_path,'3/image_split_ab'))
+        @file_blob_3 = File.new(File.join(@data_path,'3/image_split_ac'))
+
+        @blob_1 = ActionDispatch::Http::UploadedFile.new({
+            :filename => 'blob_1',
+            :type => '',
+            :tempfile => @file_blob_1
+        })
+
+        @blob_2 = ActionDispatch::Http::UploadedFile.new({
+            :filename => 'blob_2',
+            :type => '',
+            :tempfile => @file_blob_2
+        })
+
+        @blob_3 = ActionDispatch::Http::UploadedFile.new({
+            :filename => 'blob_3',
+            :type => '',
+            :tempfile => @file_blob_3
+        })
+
+        @file_entity = FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
+        @file_entity.save
+      }
+
+      it{
+        @file_entity.id.blank?.should == false
+      }
+
+      it{
+        @file_entity.uploaded?.should == false
+        @file_entity.uploading?.should == true
+      }
+
+      it{
+        @file_entity.save_blob(@blob_1)
+        @file_entity.uploaded?.should == false
+        @file_entity.uploading?.should == true
+      }
+
+      it{
+        @file_entity.save_blob(@blob_2)
+        @file_entity.uploaded?.should == false
+        @file_entity.uploading?.should == true
+      }
+
+      it{
+        @file_entity.save_blob(@blob_3)
+        @file_entity.uploaded?.should == true
+        @file_entity.uploading?.should == false
+      }
+
+      it{
+        File.exists?(@file_entity.attach.path).should == true
+      }
+
+      it{
+        @file_entity.attach.size.should == @file_size
+      }
+
+      it{
+        @file_entity.attach.content_type.should == "image/jpeg"
+      }
+
+    end
   end
 
   describe '一次上传整个文件' do
@@ -173,6 +244,43 @@ describe FilePartUpload::Base do
       file_name = File.basename(@image_path)
       @file_size = File.size(@image_path)
       @image = File.new(@image_path)
+      @file_entity = FileEntity.new(:attach => @image)
+      @file_entity.save
+    }
+
+    it{
+      @file_entity.id.blank?.should == false
+    }
+
+    it{
+      @file_entity.uploaded?.should == true
+      @file_entity.uploading?.should == false
+    }
+
+    it{
+      File.exists?(@file_entity.attach.path).should == true
+    }
+
+    it{
+      @file_entity.attach.size.should == @file_size
+    }
+
+    it{
+      @file_entity.attach.content_type.should == "image/jpeg"
+    }
+  end
+
+  describe '模仿 rails 表单 一次上传整个文件' do
+    before(:all){
+      file_name = File.basename(@image_path)
+      @file_size = File.size(@image_path)
+      image_file = File.new(@image_path)
+      @image = ActionDispatch::Http::UploadedFile.new({
+          :filename => 'image.jpg',
+          :type => '',
+          :tempfile => image_file
+      })
+
       @file_entity = FileEntity.new(:attach => @image)
       @file_entity.save
     }

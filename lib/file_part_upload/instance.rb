@@ -45,7 +45,27 @@ module FilePartUpload
       !self.uploaded?
     end
 
-    def save_first_blob(blob)
+    def save_blob(file_blob)
+      if self.saved_size == 0 || self.saved_size.blank?
+        _save_first_blob(file_blob) 
+      else
+        _save_new_blob(file_blob)
+      end
+    end
+
+    def check_status
+      return if self.saved_size != self.attach_file_size
+      attach_content_type = MIME::Types.
+            type_for(self.attach_file_name).first.content_type
+
+      self.update_attributes( 
+                              :merged => true,
+                              :attach_content_type => attach_content_type
+      )
+    end
+
+    private
+    def _save_first_blob(blob)
       FileUtils.mkdir_p(File.dirname(self.attach.path))
       FileUtils.cp(blob.path,self.attach.path)
       
@@ -55,7 +75,7 @@ module FilePartUpload
       self.check_status
     end
 
-    def save_new_blob(file_blob)
+    def _save_new_blob(file_blob)
       file_blob_size = file_blob.size
       # `cat '#{file_blob.path}' >> '#{file_path}'`
       File.open(self.attach.path,"a") do |src_f|
@@ -69,16 +89,6 @@ module FilePartUpload
       self.check_status
     end
 
-    def check_status
-      return if self.saved_size != self.attach_file_size
-      attach_content_type = MIME::Types.
-            type_for(self.attach_file_name).first.content_type
-
-      self.update_attributes( 
-                              :merged => true,
-                              :attach_content_type => attach_content_type
-      )
-    end
 
   end
 end

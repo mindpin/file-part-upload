@@ -9,5 +9,7 @@ require 'file-part-upload'
 
 require 'config/db_init'
 
+require 'action_dispatch'
+
 FilePartUpload.root = File.expand_path('../', __FILE__)
 FilePartUpload.base_path = '/'
