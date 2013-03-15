@@ -5,7 +5,7 @@ module FilePartUpload
     included do |base|
       base.before_save do
         if @upload_file.present?
-          self.attach_file_name = @upload_file.name
+          self.attach_file_name = @upload_file.filename
           self.attach_content_type = @upload_file.content_type
           self.attach_file_size = @upload_file.size 
           self.saved_size = @upload_file.size

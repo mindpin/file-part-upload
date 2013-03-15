@@ -59,13 +59,16 @@ describe FilePartUpload::Base do
 
       it{
         File.exists?(@file_entity.attach.path).should == true
-        path = File.join(FilePartUpload.root, "file_part_upload/file_entities/#{@file_entity.id}/attach/image.jpg")
-        @file_entity.attach.path.should == path
+        dir = File.join(FilePartUpload.root, "file_part_upload/file_entities/#{@file_entity.id}/attach")
+        
+        File.dirname(@file_entity.attach.path).should == dir
+        File.basename(@file_entity.attach.path).should == 'image.jpg'
+        File.extname(@file_entity.attach.path).should == '.jpg'
       }
 
       it{
-        url = File.join("/file_part_upload/file_entities/#{@file_entity.id}/attach/image.jpg")
-        @file_entity.attach.url.should == url
+        url_dir = File.join("/file_part_upload/file_entities/#{@file_entity.id}/attach")
+        File.dirname(@file_entity.attach.url).should == url_dir
       }
 
       it{
@@ -329,6 +332,21 @@ describe FilePartUpload::Base do
 
     it{
       @file_entity.attach_content_type.should == 'application/octet-stream'
+    }
+
+    it{
+      File.exists?(@file_entity.attach.path).should == true
+      dir = File.join(FilePartUpload.root, "file_part_upload/file_entities/#{@file_entity.id}/attach")
+      
+      File.dirname(@file_entity.attach.path).should == dir
+      File.basename(@file_entity.attach.path).should_not == 'image'
+      File.extname(@file_entity.attach.path).should == ''
+      @file_entity.attach.path[-1].should_not == '.'
+    }
+
+    it{
+      url_dir = File.join("/file_part_upload/file_entities/#{@file_entity.id}/attach")
+      File.dirname(@file_entity.attach.url).should == url_dir
     }
   end
 

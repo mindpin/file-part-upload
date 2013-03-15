@@ -35,13 +35,13 @@ describe 'related_path' do
 
   it{
     File.exists?(@entity.attach.path).should == true
-    path = File.join(FilePartUpload.root, "xxx/related_file_entities/#{@entity.id}/file/image.jpg")
-    @entity.attach.path.should == path
+    dir = File.join(FilePartUpload.root, "xxx/related_file_entities/#{@entity.id}/file")
+    File.dirname(@entity.attach.path).should == dir
   }
 
   it{
-    url = File.join("/xxx/related_file_entities/#{@entity.id}/file/image.jpg")
-    @entity.attach.url.should == url
+    url_dir = File.join("/xxx/related_file_entities/#{@entity.id}/file")
+    File.dirname(@entity.attach.url).should == url_dir
   }
 
 end

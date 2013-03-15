@@ -35,13 +35,15 @@ describe 'absolute_path' do
 
   it{
     File.exists?(@entity.attach.path).should == true
-    path = "/tmp/xxx/absolute_file_entities/#{@entity.id}/file/image.jpg"
-    @entity.attach.path.should == path
+    dir = "/tmp/xxx/absolute_file_entities/#{@entity.id}/file"
+    File.dirname(@entity.attach.path).should == dir
+    File.basename(@entity.attach.path).should_not == 'image.jpg'
+    File.extname(@entity.attach.path).should == '.jpg'
   }
 
   it{
-    url = "/tmp/xxx/absolute_file_entities/#{@entity.id}/file/image.jpg"
-    @entity.attach.url.should == url
+    url_dir = "/tmp/xxx/absolute_file_entities/#{@entity.id}/file"
+    File.dirname(@entity.attach.url).should == url_dir
   }
 
 end

@@ -35,13 +35,13 @@ describe 'set_url' do
 
   it{
     File.exists?(@entity.attach.path).should == true
-    path = File.join(FilePartUpload.root, "file_part_upload/set_url_file_entities/#{@entity.id}/attach/image.jpg")
-    @entity.attach.path.should == path
+    dir = File.join(FilePartUpload.root, "file_part_upload/set_url_file_entities/#{@entity.id}/attach")
+    File.dirname(@entity.attach.path).should == dir
   }
 
   it{
-    url = File.join("/xxx/set_url_file_entities/#{@entity.id}/file/image.jpg")
-    @entity.attach.url.should == url
+    url_dir = File.join("/xxx/set_url_file_entities/#{@entity.id}/file")
+    File.dirname(@entity.attach.url).should == url_dir
   }
 
 end
