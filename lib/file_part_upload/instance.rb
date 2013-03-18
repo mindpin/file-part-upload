@@ -50,25 +50,20 @@ module FilePartUpload
       end
     end
 
-    def check_status
-      return if self.saved_size != self.attach_file_size
-      attach_content_type = Util.mime_type(self.attach_file_name)
-
-      self.update_attributes( 
-                              :merged => true,
-                              :attach_content_type => attach_content_type
-      )
+    def merge
+      self.saved_size = self.attach_file_size
+      self.merged = true
     end
 
     private
     def _save_first_blob(blob)
       FileUtils.mkdir_p(File.dirname(self.attach.path))
       FileUtils.cp(blob.path,self.attach.path)
-      
-      self.update_attributes(
-        :saved_size => blob.size
-      )
-      self.check_status
+
+      self.saved_size = blob.size
+      self.save
+
+      _check_status
     end
 
     def _save_new_blob(file_blob)
@@ -82,7 +77,16 @@ module FilePartUpload
 
       self.saved_size += file_blob_size
       self.save
-      self.check_status
+      
+      _check_status
+    end
+
+    def _check_status
+      return if self.saved_size != self.attach_file_size
+
+      self.merge
+      self.attach_content_type = Util.mime_type(self.attach_file_name)
+      self.save
     end
 
 
