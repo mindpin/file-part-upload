@@ -43,6 +43,7 @@ module FilePartUpload
     end
 
     def save_blob(file_blob)
+      _catch_exception(file_blob)
       if self.saved_size == 0 || self.saved_size.blank?
         _save_first_blob(file_blob) 
       else
@@ -89,6 +90,14 @@ module FilePartUpload
       self.save
     end
 
+    def _catch_exception(file_blob)
+      raise FilePartUpload::AlreadyMergedError.new if self.merged?
+
+      ssize = self.saved_size || 0
+      if ssize + file_blob.size > self.attach_file_size
+        raise FilePartUpload::FileSizeOverflowError.new
+      end
+    end
 
   end
 end

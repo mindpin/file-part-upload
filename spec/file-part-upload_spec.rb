@@ -31,6 +31,38 @@ describe FilePartUpload::Base do
     TestMigration.down
   }
 
+  describe '异常处理' do
+    before(:each){
+      file_name = File.basename(@image_path)
+      @file_size = File.size(@image_path)
+      @blob = File.new(File.join(@data_path,'1/image'))
+
+      @file_entity = FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
+      @file_entity.save
+    }
+
+    it{
+      @file_entity.merge
+      @file_entity.save
+
+      expect { 
+        @file_entity.save_blob(@blob)
+      }.to raise_error(FilePartUpload::AlreadyMergedError)
+
+    }
+
+    it{
+      @file_entity.saved_size = 10
+      @file_entity.save
+
+      expect { 
+        @file_entity.save_blob(@blob)
+      }.to raise_error(FilePartUpload::FileSizeOverflowError)
+
+    }
+
+  end
+
   describe '分段上传一个文件' do
     describe '文件分段数量是一' do
       before(:all){

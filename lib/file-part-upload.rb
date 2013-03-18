@@ -2,6 +2,7 @@ require 'file_part_upload/instance'
 require 'file_part_upload/upload_file'
 require 'file_part_upload/attach'
 require 'file_part_upload/util'
+require 'file_part_upload/error'
 
 module FilePartUpload
 
