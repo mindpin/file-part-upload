@@ -1,7 +1,9 @@
 file-part-upload
 ================
 
-## 安装
+## 安装和配置
+
+### 引入 gem
 
 ```ruby
 # Gemfile
@@ -10,12 +12,19 @@ gem 'file-part-upload',
   :tag => '0.0.1'
 ```
 
-## 生成 gemeration
+### 生成 gemeration
 
-待完成
-
-
-## 使用说明
+```ruby
+class AddAttachColumnsToFileEntities < ActiveRecord::Migration
+  def self.change
+    add_column :file_entities, :attach_file_name,    :string
+    add_column :file_entities, :attach_content_type, :string
+    add_column :file_entities, :attach_file_size,    :integer, :limit => 8
+    add_column :file_entities, :saved_size,          :integer, :limit => 8
+    add_column :file_entities, :merged,              :boolean, :default => false
+  end
+end
+```
 
 ### 给模型增加配置
 ```ruby
@@ -23,6 +32,8 @@ class FileEntity < ActiveRecord::Base
   file_part_upload
 end
 ```
+
+## 使用说明
 
 ### 分段上传一个文件
 
