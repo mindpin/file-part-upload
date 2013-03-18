@@ -33,7 +33,11 @@ end
 if defined?(Rails)
   class Railtie < Rails::Railtie
     initializer "file_part_upload.setup_paths" do
-      FilePartUpload.root = Rails.root.join(Rails.public_path).to_s 
+      if Rails.env == 'test'
+        FilePartUpload.root = Rails.root.join(Rails.public_path,'test').to_s
+      else
+        FilePartUpload.root = Rails.root.join(Rails.public_path).to_s
+      end
       FilePartUpload.base_path = ENV['RAILS_RELATIVE_URL_ROOT'] || '/'
     end
   end
