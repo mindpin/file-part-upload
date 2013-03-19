@@ -32,6 +32,38 @@ class FileEntity < ActiveRecord::Base
   file_part_upload
 end
 ```
+#### 自定义 path 和 url
+
+path 的默认值是 file_part_upload/:class/:id/attach/:name
+如果不想用默认值，也可以通过 path 参数来指定自定义的路径
+
+
+```ruby
+# 绝对路径
+class FileEntity < ActiveRecord::Base
+  # 最后的硬盘路径 /files/:class/:id/file/:name
+  # url 是 http://host/files/:class/:id/file/:name
+  file_part_upload :path => '/files/:class/:id/file/:name',
+end
+```
+
+```ruby
+# 相对路径
+class FileEntity < ActiveRecord::Base
+  # 最后的硬盘路径 :rails_root/public/files/:class/:id/file/:name
+  # url 是 http://host/files/:class/:id/file/:name
+  file_part_upload :path => 'files/:class/:id/file/:name'
+end
+```
+```ruby
+# 自定义 url
+class FileEntity < ActiveRecord::Base
+  # 最后的硬盘路径 :rails_root/public/files/:class/:id/file/:name
+  # url 是 http://host/attachment/:class/:id/file/:name
+  file_part_upload :path => 'files/:class/:id/file/:name'
+                   :url  => '/attachment/:class/:id/file/:name'
+end
+```
 
 ## 使用说明
 
