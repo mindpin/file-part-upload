@@ -65,6 +65,17 @@ class FileEntity < ActiveRecord::Base
 end
 ```
 
+#### 针对测试环境的建议写法
+```ruby
+class FileEntity < ActiveRecord::Base
+  if Rails.env == 'test'
+    file_part_upload :path => '/test_files/:class/:id/file/:name'
+  else
+    file_part_upload :path => '/files/:class/:id/file/:name'
+  end
+end
+```
+
 ## 使用说明
 
 ### 分段上传一个文件
