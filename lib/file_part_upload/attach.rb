@@ -54,13 +54,8 @@ module FilePartUpload
       # convert :id
       config_string = config_string.gsub(':id', @instance.id.to_s)
 
-      if FilePartUpload.rails_env_is_test
-        # convert :name
-        config_string = config_string.gsub(':name', "test/#{@name}")
-      else
-        # convert :name
-        config_string = config_string.gsub(':name', @name)
-      end
+      # convert :name
+      config_string = config_string.gsub(':name', @name)
 
       config_string      
     end

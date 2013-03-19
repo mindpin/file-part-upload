@@ -13,4 +13,3 @@ require 'action_dispatch'
 
 FilePartUpload.root = File.expand_path('../', __FILE__)
 FilePartUpload.base_path = '/'
-FilePartUpload.rails_env_is_test = false
