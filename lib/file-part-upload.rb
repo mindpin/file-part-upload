@@ -1,4 +1,5 @@
 require 'file_part_upload/instance'
+require 'file_part_upload/validate'
 require 'file_part_upload/upload_file'
 require 'file_part_upload/attach'
 require 'file_part_upload/util'
@@ -19,7 +20,8 @@ module FilePartUpload
                               :attach_file_size
 
         self.class_variable_set(:@@file_part_upload_config, config) 
-        self.send(:include, FilePartUpload::Instance) 
+        self.send(:include, FilePartUpload::Validate)
+        self.send(:include, FilePartUpload::Instance)
       end
 
       def file_part_upload_config

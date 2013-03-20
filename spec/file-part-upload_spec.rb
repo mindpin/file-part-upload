@@ -31,6 +31,28 @@ describe FilePartUpload::Base do
     TestMigration.down
   }
 
+  describe '字段校验' do
+    before(:each){
+      @file_name = File.basename(@image_path)
+      @file_size = File.size(@image_path)
+      @blob = File.new(File.join(@data_path,'1/image'))
+
+    }
+
+    it{
+      expect{
+        FileEntity.create!(:attach_file_size => @file_size)
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    }
+
+    it{
+      expect{
+        FileEntity.create!(:attach_file_name => @file_name)
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    }
+
+  end
+
   describe '异常处理' do
     before(:each){
       file_name = File.basename(@image_path)

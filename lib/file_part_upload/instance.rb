@@ -3,16 +3,6 @@ module FilePartUpload
     extend ActiveSupport::Concern
 
     included do |base|
-      base.before_save do
-        if @upload_file.present?
-          self.attach_file_name = @upload_file.filename
-          self.attach_content_type = @upload_file.content_type
-          self.attach_file_size = @upload_file.size 
-          self.saved_size = @upload_file.size
-          self.merged = true
-        end
-      end
-
       base.after_save do
         if @upload_file.present?
           @upload_file.copy_to(self.attach.path)
@@ -32,6 +22,12 @@ module FilePartUpload
 
     def attach=(file)
       @upload_file = UploadFile.new(file)
+
+      self.attach_file_name    = @upload_file.filename
+      self.attach_content_type = @upload_file.content_type
+      self.attach_file_size    = @upload_file.size 
+      self.saved_size          = @upload_file.size
+      self.merged              = true
     end
 
     def uploaded?
@@ -86,7 +82,6 @@ module FilePartUpload
       return if self.saved_size != self.attach_file_size
 
       self.merge
-      self.attach_content_type = Util.mime_type(self.attach_file_name)
       self.save
     end
 
