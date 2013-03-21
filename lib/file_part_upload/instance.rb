@@ -30,6 +30,11 @@ module FilePartUpload
       self.merged              = true
     end
 
+    def attach_file_name=(attach_file_name)
+      file_name = Util.get_randstr_filename(attach_file_name)
+      write_attribute(:attach_file_name, file_name)
+    end
+
     def uploaded?
       self.merged?
     end

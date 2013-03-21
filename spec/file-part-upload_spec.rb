@@ -116,7 +116,7 @@ describe FilePartUpload::Base do
         dir = File.join(FilePartUpload.root, "file_part_upload/file_entities/#{@file_entity.id}/attach")
         
         File.dirname(@file_entity.attach.path).should == dir
-        File.basename(@file_entity.attach.path).should == 'image.jpg'
+        File.basename(@file_entity.attach.path).should_not == 'image.jpg'
         File.extname(@file_entity.attach.path).should == '.jpg'
       }
 
