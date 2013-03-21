@@ -87,7 +87,7 @@ describe FilePartUpload::Base do
 
   describe '分段上传一个文件' do
     describe '文件分段数量是一' do
-      before(:all){
+      before(:each){
         file_name = File.basename(@image_path)
         @file_size = File.size(@image_path)
         @blob = File.new(File.join(@data_path,'1/image'))
@@ -112,6 +112,7 @@ describe FilePartUpload::Base do
       }
 
       it{
+        @file_entity.save_blob(@blob)
         File.exists?(@file_entity.attach.path).should == true
         dir = File.join(FilePartUpload.root, "file_part_upload/file_entities/#{@file_entity.id}/attach")
         
@@ -121,21 +122,24 @@ describe FilePartUpload::Base do
       }
 
       it{
+        @file_entity.save_blob(@blob)
         url_dir = File.join("/file_part_upload/file_entities/#{@file_entity.id}/attach")
         File.dirname(@file_entity.attach.url).should == url_dir
       }
 
       it{
+        @file_entity.save_blob(@blob)
         @file_entity.attach.size.should == @file_size
       }
 
       it{
+        @file_entity.save_blob(@blob)
         @file_entity.attach.content_type.should == "image/jpeg"
       }
     end
 
     describe '文件分段数量是二' do
-      before(:all){
+      before(:each){
         file_name = File.basename(@image_path)
         @file_size = File.size(@image_path)
         @blob_1 = File.new(File.join(@data_path,'2/image_split_aa'))
@@ -161,26 +165,33 @@ describe FilePartUpload::Base do
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
         @file_entity.save_blob(@blob_2)
         @file_entity.uploaded?.should == true
         @file_entity.uploading?.should == false
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
+        @file_entity.save_blob(@blob_2)
         File.exists?(@file_entity.attach.path).should == true
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
+        @file_entity.save_blob(@blob_2)
         @file_entity.attach.size.should == @file_size
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
+        @file_entity.save_blob(@blob_2)
         @file_entity.attach.content_type.should == "image/jpeg"
       }
     end
 
     describe '文件分段数量是三' do
-      before(:all){
+      before(:each){
         file_name = File.basename(@image_path)
         @file_size = File.size(@image_path)
         @blob_1 = File.new(File.join(@data_path,'3/image_split_aa'))
@@ -207,32 +218,44 @@ describe FilePartUpload::Base do
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
         @file_entity.save_blob(@blob_2)
         @file_entity.uploaded?.should == false
         @file_entity.uploading?.should == true
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
+        @file_entity.save_blob(@blob_2)
         @file_entity.save_blob(@blob_3)
         @file_entity.uploaded?.should == true
         @file_entity.uploading?.should == false
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
+        @file_entity.save_blob(@blob_2)
+        @file_entity.save_blob(@blob_3)
         File.exists?(@file_entity.attach.path).should == true
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
+        @file_entity.save_blob(@blob_2)
+        @file_entity.save_blob(@blob_3)
         @file_entity.attach.size.should == @file_size
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
+        @file_entity.save_blob(@blob_2)
+        @file_entity.save_blob(@blob_3)
         @file_entity.attach.content_type.should == "image/jpeg"
       }
     end
 
     describe '模仿 rails 表单上传' do
-      before(:all){
+      before(:each){
         file_name = File.basename(@image_path)
         @file_size = File.size(@image_path)
         @file_blob_1 = File.new(File.join(@data_path,'3/image_split_aa'))
@@ -277,26 +300,38 @@ describe FilePartUpload::Base do
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
         @file_entity.save_blob(@blob_2)
         @file_entity.uploaded?.should == false
         @file_entity.uploading?.should == true
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
+        @file_entity.save_blob(@blob_2)
         @file_entity.save_blob(@blob_3)
         @file_entity.uploaded?.should == true
         @file_entity.uploading?.should == false
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
+        @file_entity.save_blob(@blob_2)
+        @file_entity.save_blob(@blob_3)
         File.exists?(@file_entity.attach.path).should == true
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
+        @file_entity.save_blob(@blob_2)
+        @file_entity.save_blob(@blob_3)
         @file_entity.attach.size.should == @file_size
       }
 
       it{
+        @file_entity.save_blob(@blob_1)
+        @file_entity.save_blob(@blob_2)
+        @file_entity.save_blob(@blob_3)
         @file_entity.attach.content_type.should == "image/jpeg"
       }
 
@@ -304,7 +339,7 @@ describe FilePartUpload::Base do
   end
 
   describe '一次上传整个文件' do
-    before(:all){
+    before(:each){
       file_name = File.basename(@image_path)
       @file_size = File.size(@image_path)
       @image = File.new(@image_path)
@@ -335,7 +370,7 @@ describe FilePartUpload::Base do
   end
 
   describe '模仿 rails 表单 一次上传整个文件' do
-    before(:all){
+    before(:each){
       @file_size = File.size(@image_path)
       image_file = File.new(@image_path)
       @image = ActionDispatch::Http::UploadedFile.new({
@@ -371,7 +406,7 @@ describe FilePartUpload::Base do
   end
 
   describe '文件没有扩展名' do
-    before(:all){
+    before(:each){
       image_file = File.new(File.join(@data_path,'1/image'))
 
       @image = ActionDispatch::Http::UploadedFile.new({
