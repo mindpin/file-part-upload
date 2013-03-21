@@ -110,6 +110,9 @@ end
   
   # 文件 content_type
   file_entity.attach.content_type
+  
+  # 获取文件原始名
+  file_entity.attach_file_name
 ```
 
 ### 整个文件上传
