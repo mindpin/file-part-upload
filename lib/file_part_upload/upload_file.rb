@@ -8,8 +8,12 @@ module FilePartUpload
       @file.path
     end
 
-    def filename
-      filename ||= Util.get_randstr_filename(_original_filename)
+    def original_filename
+      if @file.respond_to?(:original_filename)
+        @file.original_filename
+      else
+        File.basename(@file.path)
+      end
     end
 
     def size
@@ -22,16 +26,7 @@ module FilePartUpload
     end
 
     def content_type
-      Util.mime_type(_original_filename)
-    end
-
-    private
-    def _original_filename
-      if @file.respond_to?(:original_filename)
-        @file.original_filename
-      else
-        File.basename(@file.path)
-      end
+      Util.mime_type(original_filename)
     end
 
   end

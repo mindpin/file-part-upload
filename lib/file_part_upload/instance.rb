@@ -11,10 +11,10 @@ module FilePartUpload
     end
 
     def attach
-      if self.attach_file_name.present?
+      if self.saved_file_name.present?
         Attach.new(
                     :instance => self, 
-                    :name => self.attach_file_name, 
+                    :name => self.saved_file_name, 
                     :size => self.attach_file_size
                   )
       end
@@ -23,7 +23,7 @@ module FilePartUpload
     def attach=(file)
       @upload_file = UploadFile.new(file)
 
-      self.attach_file_name    = @upload_file.filename
+      self.attach_file_name    = @upload_file.original_filename
       self.attach_content_type = @upload_file.content_type
       self.attach_file_size    = @upload_file.size 
       self.saved_size          = @upload_file.size
@@ -31,8 +31,10 @@ module FilePartUpload
     end
 
     def attach_file_name=(attach_file_name)
-      file_name = Util.get_randstr_filename(attach_file_name)
-      write_attribute(:attach_file_name, file_name)
+      write_attribute(:attach_file_name, attach_file_name)
+
+      saved_file_name = Util.get_randstr_filename(attach_file_name)
+      write_attribute(:saved_file_name, saved_file_name)      
     end
 
     def uploaded?

@@ -7,6 +7,7 @@ class RelatedFileEntityMigration < ActiveRecord::Migration
       t.string   :attach_content_type
       t.integer  :attach_file_size, :limit => 8
       t.integer  :saved_size,       :limit => 8
+      t.string   :saved_file_name
       t.boolean  :merged,           :default => false
       t.string   :md5
     end

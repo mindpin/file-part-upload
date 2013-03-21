@@ -7,6 +7,7 @@ class TestMigration < ActiveRecord::Migration
       t.string   :attach_content_type
       t.integer  :attach_file_size, :limit => 8
       t.integer  :saved_size,       :limit => 8
+      t.string   :saved_file_name
       t.boolean  :merged,           :default => false
       t.string   :md5
     end
@@ -113,12 +114,18 @@ describe FilePartUpload::Base do
 
       it{
         @file_entity.save_blob(@blob)
+        @file_entity.attach_file_name.should == 'image.jpg'
+        @file_entity.saved_file_name.should_not == 'image.jpg'
+        File.extname(@file_entity.saved_file_name).should == '.jpg'
+      }
+
+      it{
+        @file_entity.save_blob(@blob)
         File.exists?(@file_entity.attach.path).should == true
         dir = File.join(FilePartUpload.root, "file_part_upload/file_entities/#{@file_entity.id}/attach")
         
         File.dirname(@file_entity.attach.path).should == dir
         File.basename(@file_entity.attach.path).should_not == 'image.jpg'
-        File.extname(@file_entity.attach.path).should == '.jpg'
       }
 
       it{
@@ -367,6 +374,13 @@ describe FilePartUpload::Base do
     it{
       @file_entity.attach.content_type.should == "image/jpeg"
     }
+
+    it{
+      @file_entity.attach_file_name.should == 'image.jpg'
+      @file_entity.saved_file_name.should_not == 'image.jpg'
+      File.extname(@file_entity.saved_file_name).should == '.jpg'
+      File.basename(@file_entity.attach.path).should_not == 'image.jpg'
+    }
   end
 
   describe '模仿 rails 表单 一次上传整个文件' do
@@ -403,6 +417,13 @@ describe FilePartUpload::Base do
     it{
       @file_entity.attach.content_type.should == "image/jpeg"
     }
+
+    it{
+      @file_entity.attach_file_name.should == 'image.jpg'
+      @file_entity.saved_file_name.should_not == 'image.jpg'
+      File.basename(@file_entity.attach.path).should_not == 'image.jpg'
+      File.extname(@file_entity.saved_file_name).should == '.jpg'
+    }
   end
 
   describe '文件没有扩展名' do
@@ -431,6 +452,14 @@ describe FilePartUpload::Base do
       File.basename(@file_entity.attach.path).should_not == 'image'
       File.extname(@file_entity.attach.path).should == ''
       @file_entity.attach.path[-1].should_not == '.'
+    }
+
+
+    it{
+      @file_entity.attach_file_name.should == 'image'
+      @file_entity.saved_file_name.should_not == 'image'
+      File.extname(@file_entity.saved_file_name).should == ''
+      File.basename(@file_entity.attach.path).should_not == 'image'
     }
 
     it{
