@@ -20,7 +20,7 @@ class AddAttachColumnsToFileEntities < ActiveRecord::Migration
     add_column :file_entities, :attach_file_name,    :string
     add_column :file_entities, :attach_content_type, :string
     add_column :file_entities, :attach_file_size,    :integer, :limit => 8
-    add_column :file_entities, :saved_file_name
+    add_column :file_entities, :saved_file_name,     :string
     add_column :file_entities, :saved_size,          :integer, :limit => 8
     add_column :file_entities, :merged,              :boolean, :default => false
   end
