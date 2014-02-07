@@ -23,6 +23,7 @@ module FilePartUpload
     def copy_to(new_path)
       FileUtils.mkdir_p(File.dirname(new_path))
       FileUtils.cp(self.path, new_path)
+      FileUtils.chmod(0644, new_path)
     end
 
     def content_type

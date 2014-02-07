@@ -63,7 +63,7 @@ module FilePartUpload
     def _save_first_blob(blob)
       FileUtils.mkdir_p(File.dirname(self.attach.path))
       FileUtils.cp(blob.path,self.attach.path)
-
+      FileUtils.chmod(0644, self.attach.path)
       self.saved_size = blob.size
       self.save
 
