@@ -6,6 +6,7 @@ require 'file_part_upload/util'
 require 'file_part_upload/error'
 require 'file_part_upload/file_entity'
 require 'file_part_upload/config'
+require 'file_part_upload/controller_helper'
 
 module FilePartUpload
 
