@@ -14,5 +14,5 @@ Gem::Specification.new do |s|
   s.files = Dir.glob("lib/**/*") + %w(README.md)
   s.require_paths = ['lib']
 
-  s.add_runtime_dependency 'mime-types', '~> 2.3'
+  s.add_runtime_dependency 'mime-types'
 end
