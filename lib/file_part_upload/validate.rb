@@ -1,8 +1,6 @@
 module FilePartUpload
   module Validate
-    extend ActiveSupport::Concern
-
-    included do |base|
+    def self.included(base)
       base.validates :attach_file_name,    :presence => true
       base.validates :attach_file_size,    :presence => true
       base.validates :attach_content_type, :presence => true

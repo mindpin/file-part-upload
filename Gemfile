@@ -1,8 +1,11 @@
 source 'http://rubygems.org'
-gem 'rspec'
-gem 'coveralls', require: false
 
-gem 'mysql2'
-gem 'activesupport'
-gem 'activerecord'
-gem 'actionpack'
+gemspec
+
+gem "mongoid", "~> 4.0.0.beta1"
+
+group :test do
+  gem "rspec"
+  gem "database_cleaner", "~> 1.2.0"
+  gem "actionpack"
+end

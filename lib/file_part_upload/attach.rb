@@ -6,11 +6,11 @@ module FilePartUpload
       @size    = options[:size]
 
 
-      file_part_upload_config = @instance.class.file_part_upload_config 
+      file_part_upload_config = FilePartUpload.file_part_upload_config 
 
 
       @path_config = file_part_upload_config[:path] ||
-        "file_part_upload/:class/:id/attach/:name"
+        ":class/:id/attach/:name"
 
       url = file_part_upload_config[:url] || @path_config
       @url_config = File.join("/", url)
@@ -39,11 +39,6 @@ module FilePartUpload
     end
 
     private
-    def _default_path
-      File.join('file_part_upload', @instance.class.name.tableize, 
-        @instance.id.to_s, 'attach', @name)
-    end
-
     # "file_part_upload/:class/:id/attach/:name" 
     # =>
     # "file_part_upload/file_entity/1/attach/xxx.jpg"

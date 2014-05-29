@@ -1,8 +1,6 @@
 module FilePartUpload
   module Instance
-    extend ActiveSupport::Concern
-
-    included do |base|
+    def self.included(base)
       base.after_save do
         if @upload_file.present?
           @upload_file.copy_to(self.attach.path)

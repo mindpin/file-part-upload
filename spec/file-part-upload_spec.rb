@@ -1,55 +1,28 @@
 require 'spec_helper'
 
-class TestMigration < ActiveRecord::Migration
-  def self.up
-    create_table :file_entities, :force => true do |t|
-      t.string   :attach_file_name
-      t.string   :attach_content_type
-      t.integer  :attach_file_size, :limit => 8
-      t.integer  :saved_size,       :limit => 8
-      t.string   :saved_file_name
-      t.boolean  :merged,           :default => false
-      t.string   :md5
-    end
-  end
-
-  def self.down
-    drop_table :file_entities
-  end
-end
-
-class FileEntity < ActiveRecord::Base
-  file_part_upload
-end
-
-describe FilePartUpload::Base do
-  before(:all){
-    TestMigration.up
+describe FilePartUpload do
+  before{
     @data_path = File.expand_path("../data",__FILE__)
     @image_path = File.join(@data_path, "image.jpg")
   }
-  after(:all) {
-    TestMigration.down
-  }
 
   describe '字段校验' do
-    before(:each){
+    before{
       @file_name = File.basename(@image_path)
       @file_size = File.size(@image_path)
       @blob = File.new(File.join(@data_path,'1/image'))
-
     }
 
     it{
       expect{
-        FileEntity.create!(:attach_file_size => @file_size)
-      }.to raise_error(ActiveRecord::RecordInvalid)
+        FilePartUpload::FileEntity.create!(:attach_file_size => @file_size)
+      }.to raise_error(Mongoid::Errors::Validations)
     }
 
     it{
       expect{
-        FileEntity.create!(:attach_file_name => @file_name)
-      }.to raise_error(ActiveRecord::RecordInvalid)
+        FilePartUpload::FileEntity.create!(:attach_file_name => @file_name)
+      }.to raise_error(Mongoid::Errors::Validations)
     }
 
   end
@@ -60,7 +33,7 @@ describe FilePartUpload::Base do
       @file_size = File.size(@image_path)
       @blob = File.new(File.join(@data_path,'1/image'))
 
-      @file_entity = FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
+      @file_entity = FilePartUpload::FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
       @file_entity.save
     }
 
@@ -93,7 +66,7 @@ describe FilePartUpload::Base do
         @file_size = File.size(@image_path)
         @blob = File.new(File.join(@data_path,'1/image'))
 
-        @file_entity = FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
+        @file_entity = FilePartUpload::FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
         @file_entity.save
       }
 
@@ -152,7 +125,7 @@ describe FilePartUpload::Base do
         @blob_1 = File.new(File.join(@data_path,'2/image_split_aa'))
         @blob_2 = File.new(File.join(@data_path,'2/image_split_ab'))
 
-        @file_entity = FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
+        @file_entity = FilePartUpload::FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
         @file_entity.save
       }
 
@@ -205,7 +178,7 @@ describe FilePartUpload::Base do
         @blob_2 = File.new(File.join(@data_path,'3/image_split_ab'))
         @blob_3 = File.new(File.join(@data_path,'3/image_split_ac'))
 
-        @file_entity = FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
+        @file_entity = FilePartUpload::FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
         @file_entity.save
       }
 
@@ -287,7 +260,7 @@ describe FilePartUpload::Base do
             :tempfile => @file_blob_3
         })
 
-        @file_entity = FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
+        @file_entity = FilePartUpload::FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
         @file_entity.save
       }
 
@@ -350,7 +323,7 @@ describe FilePartUpload::Base do
       file_name = File.basename(@image_path)
       @file_size = File.size(@image_path)
       @image = File.new(@image_path)
-      @file_entity = FileEntity.new(:attach => @image)
+      @file_entity = FilePartUpload::FileEntity.new(:attach => @image)
       @file_entity.save
     }
 
@@ -393,7 +366,7 @@ describe FilePartUpload::Base do
           :tempfile => image_file
       })
 
-      @file_entity = FileEntity.new(:attach => @image)
+      @file_entity = FilePartUpload::FileEntity.new(:attach => @image)
       @file_entity.save
     }
 
@@ -436,7 +409,7 @@ describe FilePartUpload::Base do
           :tempfile => image_file
       })
 
-      @file_entity = FileEntity.new(:attach => @image)
+      @file_entity = FilePartUpload::FileEntity.new(:attach => @image)
       @file_entity.save
     }
 

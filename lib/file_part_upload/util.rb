@@ -1,3 +1,5 @@
+require 'mime/types'
+
 module FilePartUpload
   class Util
     def self.mime_type(file_name)
