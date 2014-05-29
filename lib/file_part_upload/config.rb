@@ -15,5 +15,9 @@ module FilePartUpload
       config[:url] = str
       FilePartUpload.instance_variable_set(:@file_part_upload_config, config) 
     end
+
+    def self.add_methods(_module)
+      FilePartUpload::FileEntity.send(:include, _module)
+    end
   end
 end
