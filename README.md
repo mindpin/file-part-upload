@@ -9,75 +9,44 @@ file-part-upload
 # Gemfile
 gem 'file-part-upload', 
   :git => 'git://github.com/mindpin/file-part-upload.git',
-  :tag => '0.0.1'
-```
-
-### 生成 gemeration
-
-```ruby
-class AddAttachColumnsToFileEntities < ActiveRecord::Migration
-  def self.change
-    add_column :file_entities, :attach_file_name,    :string
-    add_column :file_entities, :attach_content_type, :string
-    add_column :file_entities, :attach_file_size,    :integer, :limit => 8
-    add_column :file_entities, :saved_file_name,     :string
-    add_column :file_entities, :saved_size,          :integer, :limit => 8
-    add_column :file_entities, :merged,              :boolean, :default => false
-  end
-end
-```
-
-### 给模型增加配置
-```ruby
-class FileEntity < ActiveRecord::Base
-  file_part_upload
-end
-```
-#### 自定义 path 和 url
-
-path 的默认值是 file_part_upload/:class/:id/attach/:name
-如果不想用默认值，也可以通过 path 参数来指定自定义的路径
-
-
-```ruby
-# 绝对路径
-class FileEntity < ActiveRecord::Base
-  # 最后的硬盘路径 /files/:class/:id/file/:name
-  # url 是 http://host/files/:class/:id/file/:name
-  file_part_upload :path => '/files/:class/:id/file/:name',
-end
-```
-
-```ruby
-# 相对路径
-class FileEntity < ActiveRecord::Base
-  # 最后的硬盘路径 :rails_root/public/files/:class/:id/file/:name
-  # url 是 http://host/files/:class/:id/file/:name
-  file_part_upload :path => 'files/:class/:id/file/:name'
-end
-```
-```ruby
-# 自定义 url
-class FileEntity < ActiveRecord::Base
-  # 最后的硬盘路径 :rails_root/public/files/:class/:id/file/:name
-  # url 是 http://host/attachment/:class/:id/file/:name
-  file_part_upload :path => 'files/:class/:id/file/:name'
-                   :url  => '/attachment/:class/:id/file/:name'
-end
-```
-
-#### 针对测试环境的建议写法
-```ruby
-class FileEntity < ActiveRecord::Base
-  if Rails.env == 'test'
-    file_part_upload :path => '/test_files/:class/:id/file/:name'
-  else
-    file_part_upload :path => '/files/:class/:id/file/:name'
-  end
-end
+  :tag => '1.0.3'
 ```
 
 ## 使用说明
+
+### 配置文件存储路径和 url
+
+绝对路径
+```ruby
+# initialize/file_part_upload.rb
+FilePartUpload.config do
+  # 最后的硬盘路径 /files/:id/file/:name
+  # url 的 path 部分是 /files/:id/file/:name
+  path => '/files/:id/file/:name'
+end
+```
+
+相对路径
+```ruby
+# initialize/file_part_upload.rb
+FilePartUpload.config do
+  # 最后的硬盘路径 :project_root/public/files/:id/file/:name
+  # url 的 path 部分是 /files/:id/file/:name
+  path => 'files/:id/file/:name'
+end
+```
+
+自定义url
+```ruby
+# initialize/file_part_upload.rb
+FilePartUpload.config do
+  # 最后的硬盘路径 :project_root/public/files/:id/file/:name
+  # url 的 path 部分是 /attachment/:id/file/:name
+  path => 'files/:id/file/:name'
+  url  => '/attachment/:id/file/:name'
+end
+```
+
 
 ### 分段上传一个文件
 
@@ -123,3 +92,47 @@ end
 ```
 
 
+### 配置给 file_entity include module
+
+```ruby
+# initialize/file_part_upload.rb
+module ExpandMethods
+  # 给 file_entity 增加一些方法
+end
+FilePartUpload.config do
+  add_methods ExpandMethods
+end
+```
+
+### rails controller/sinatra action 引入 module
+```ruby
+class ApplicationController < ActionController::Base
+  include FilePartUpload::ControllerHelper
+end
+
+class XXXApp < Sinatra::Base
+  helpers FilePartUpload::ControllerHelper
+end
+```
+
+FilePartUpload::ControllerHelper 的实现
+```ruby
+module FilePartUpload
+  module ControllerHelper
+    def start_uploading(file_name, file_size)
+      file_entity = FilePartUpload::FileEntity.new(:attach_file_name => file_name, :attach_file_size => file_size)
+      file_entity.save
+    end
+
+    def continue_uploading(id, blob)
+      file_entity = FilePartUpload::FileEntity.find(id)
+      file_entity.save_blob(blob)
+    end
+
+    def full_upload(file)
+      file_entity = FilePartUpload::FileEntity.new(:attach => file)
+      file_entity.save
+    end
+  end
+end
+```
