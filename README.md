@@ -82,6 +82,9 @@ end
   
   # 获取文件原始名
   file_entity.attach_file_name
+  
+  # 已经保存的文件大小
+  file_entity.saved_size
 ```
 
 ### 整个文件上传
