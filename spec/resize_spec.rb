@@ -48,5 +48,12 @@ describe 'resize' do
       @entity.attach.url(:xxx).match(/file\/xxx_#{name}\.jpg/).class.should == MatchData
       @entity.attach.url(:normal).match(/file\/normal_#{name}\.jpg/).class.should == MatchData
     }
+
+    it{
+      data_path = File.expand_path("../data",__FILE__)
+      image_path = File.join(data_path, "text.txt")
+      file = File.new(image_path)
+      @entity = FilePartUpload::FileEntity.create!(:attach => file)
+    }
   end
 end

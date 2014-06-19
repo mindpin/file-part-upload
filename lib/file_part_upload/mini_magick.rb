@@ -4,6 +4,7 @@ module FilePartUpload
   class MiniMagick
     def self.resize!(attach)
       image_versions = FilePartUpload.file_part_upload_config[:image_versions]
+      return if image_versions.blank?
       image_versions.each do |image_version|
         mm = FilePartUpload::MiniMagick.new(attach, image_version[:name])
         mm.send(image_version[:type], *image_version[:args])

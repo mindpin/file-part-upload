@@ -39,6 +39,7 @@ module FilePartUpload
     end
 
     def resize!
+      return if !content_type.match("image")
       FilePartUpload::MiniMagick.resize!(self)
     end
 
