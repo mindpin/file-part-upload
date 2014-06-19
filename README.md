@@ -9,7 +9,7 @@ file-part-upload
 # Gemfile
 gem 'file-part-upload', 
   :git => 'git://github.com/mindpin/file-part-upload.git',
-  :tag => '1.0.3'
+  :tag => '1.0.5'
 ```
 
 ## 使用说明
@@ -47,6 +47,26 @@ FilePartUpload.config do
 end
 ```
 
+### 配置缩略图
+```ruby
+# initialize/file_part_upload.rb
+FilePartUpload.config do
+  image_version :large do
+    process :resize_to_fill => [180, 180]
+  end
+  image_version :normal do
+    process :resize_to_fill => [64, 64]
+  end
+  image_version :small do
+    process :resize_to_fill => [30, 30]
+  end
+
+  image_version :xxx do
+    process :resize_to_fit => [30, 31]
+  end
+end
+```
+
 
 ### 分段上传一个文件
 
@@ -68,11 +88,17 @@ end
   # 是否还没有上传完毕
   file_entity.uploading?
   
-  # 文件路径
+  # 原始文件路径
   file_entity.attach.path
+
+  # 缩略图文件路径
+  file_entity.attach.path(:small)
   
-  # 文件url
+  # 原始文件url
   file_entity.attach.url
+
+  # 缩略图文件url
+  file_entity.attach.url(:small)
   
   # 文件大小
   file_entity.attach.size
