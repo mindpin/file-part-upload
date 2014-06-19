@@ -4,6 +4,7 @@ module FilePartUpload
       base.after_save do
         if @upload_file.present?
           @upload_file.copy_to(self.attach.path)
+          self.attach.resize!
         end
       end
     end
@@ -88,6 +89,7 @@ module FilePartUpload
 
       self.merge
       self.save
+      self.attach.resize!
     end
 
     def _catch_exception(file_blob)

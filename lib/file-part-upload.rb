@@ -1,3 +1,4 @@
+require 'file_part_upload/mini_magick'
 require 'file_part_upload/instance'
 require 'file_part_upload/validate'
 require 'file_part_upload/upload_file'

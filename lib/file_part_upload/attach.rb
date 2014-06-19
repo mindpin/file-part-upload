@@ -16,15 +16,15 @@ module FilePartUpload
       @url_config = File.join("/", url)
     end
 
-    def path
-      res = _convert_path(@path_config)
+    def path(version = nil)
+      res = _convert_path(@path_config, version)
       return res if res[0] == "/"
 
       File.join(FilePartUpload.root, res)
     end
 
-    def url
-      res = _convert_path(@url_config)
+    def url(version = nil)
+      res = _convert_path(@url_config, version)
       return res if res[0] == "/"
 
       File.join(FilePartUpload.base_path, res)
@@ -38,11 +38,15 @@ module FilePartUpload
       File.size(path)
     end
 
+    def resize!
+      FilePartUpload::MiniMagick.resize!(self)
+    end
+
     private
     # "file_part_upload/:class/:id/attach/:name" 
     # =>
     # "file_part_upload/file_entity/1/attach/xxx.jpg"
-    def _convert_path(config_string)
+    def _convert_path(config_string, version = nil)
       # convert :class
       config_string = config_string.gsub(':class', @instance.class.name.tableize)
 
@@ -50,7 +54,11 @@ module FilePartUpload
       config_string = config_string.gsub(':id', @instance.id.to_s)
 
       # convert :name
-      config_string = config_string.gsub(':name', @name)
+      if version.blank?
+        config_string = config_string.gsub(':name', @name)
+      else
+        config_string = config_string.gsub(':name', "#{version}_#{@name}" )
+      end
 
       config_string      
     end

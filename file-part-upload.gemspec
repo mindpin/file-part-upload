@@ -15,4 +15,5 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_runtime_dependency 'mime-types'
+  s.add_runtime_dependency 'mini_magick'
 end
