@@ -67,6 +67,10 @@ FilePartUpload.config do
 end
 ```
 
+重新生成缩略图
+```ruby
+file_entity.attach.resize!
+```
 
 ### 分段上传一个文件
 
