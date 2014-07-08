@@ -12,5 +12,6 @@ module FilePartUpload
 
     include FilePartUpload::Validate
     include FilePartUpload::Instance
+    include FilePartUpload::OfficeMethods
   end
 end

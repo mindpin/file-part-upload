@@ -1,4 +1,5 @@
 require 'file_part_upload/mini_magick'
+require 'file_part_upload/office_methods'
 require 'file_part_upload/instance'
 require 'file_part_upload/validate'
 require 'file_part_upload/upload_file'
@@ -8,6 +9,7 @@ require 'file_part_upload/error'
 require 'file_part_upload/file_entity'
 require 'file_part_upload/config'
 require 'file_part_upload/controller_helper'
+require 'file_part_upload/office_helper'
 
 module FilePartUpload
 
