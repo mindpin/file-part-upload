@@ -9,7 +9,7 @@ file-part-upload
 # Gemfile
 gem 'file-part-upload', 
   :git => 'git://github.com/mindpin/file-part-upload.git',
-  :tag => '1.0.5'
+  :tag => '1.0.6'
 ```
 
 ## 使用说明
@@ -115,6 +115,7 @@ file_entity.attach.resize!
   
   # 已经保存的文件大小
   file_entity.saved_size
+
 ```
 
 ### 整个文件上传
@@ -168,4 +169,20 @@ module FilePartUpload
     end
   end
 end
+```
+
+### office 相关
+
+```
+# 判断是否是 office
+file_entity.is_office?
+```
+
+controller 或者 view include FilePartUpload::OfficeHelper
+```
+# 传入一个 office 文件的在线url,生成一个可以在线预览该文件的 url
+office_online_view_url(office_file_url)
+
+# 传入一个 office 文件的 file_entity,生成一个可以在线预览该文件的 url
+office_online_view_url(file_entity)
 ```
