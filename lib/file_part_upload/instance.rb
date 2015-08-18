@@ -1,3 +1,9 @@
+# 待删除
+# 待删除
+# 待删除
+# 待删除
+# 待删除
+
 module FilePartUpload
   module Instance
     def self.included(base)
@@ -12,8 +18,8 @@ module FilePartUpload
     def attach
       if self.saved_file_name.present?
         Attach.new(
-                    :instance => self, 
-                    :name => self.saved_file_name, 
+                    :instance => self,
+                    :name => self.saved_file_name,
                     :size => self.attach_file_size
                   )
       end
@@ -24,7 +30,7 @@ module FilePartUpload
 
       self.attach_file_name    = @upload_file.original_filename
       self.attach_content_type = @upload_file.content_type
-      self.attach_file_size    = @upload_file.size 
+      self.attach_file_size    = @upload_file.size
       self.saved_size          = @upload_file.size
       self.merged              = true
     end
@@ -33,7 +39,7 @@ module FilePartUpload
       write_attribute(:attach_file_name, attach_file_name)
 
       saved_file_name = Util.get_randstr_filename(attach_file_name)
-      write_attribute(:saved_file_name, saved_file_name)      
+      write_attribute(:saved_file_name, saved_file_name)
     end
 
     def uploaded?
@@ -47,7 +53,7 @@ module FilePartUpload
     def save_blob(file_blob)
       _catch_exception(file_blob)
       if self.saved_size == 0 || self.saved_size.blank?
-        _save_first_blob(file_blob) 
+        _save_first_blob(file_blob)
       else
         _save_new_blob(file_blob)
       end
@@ -80,7 +86,7 @@ module FilePartUpload
 
       self.saved_size += file_blob_size
       self.save
-      
+
       _check_status
     end
 

@@ -5,6 +5,7 @@ describe FilePartUpload do
     FilePartUpload.config do
       url nil
       path nil
+      mode :local
     end
 
     @data_path = File.expand_path("../data",__FILE__)
@@ -20,13 +21,13 @@ describe FilePartUpload do
 
     it{
       expect{
-        FilePartUpload::FileEntity.create!(:attach_file_size => @file_size)
+        FilePartUpload::FileEntity.create!(:file_size => @file_size)
       }.to raise_error(Mongoid::Errors::Validations)
     }
 
     it{
       expect{
-        FilePartUpload::FileEntity.create!(:attach_file_name => @file_name)
+        FilePartUpload::FileEntity.create!(:file_size => @file_name)
       }.to raise_error(Mongoid::Errors::Validations)
     }
 
@@ -38,12 +39,12 @@ describe FilePartUpload do
       @file_size = File.size(@image_path)
       @blob = File.new(File.join(@data_path,'1/image'))
 
-      @file_entity = FilePartUpload::FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
+      @file_entity = FilePartUpload::FileEntity.new(:original => file_name, :file_size => @file_size)
       @file_entity.save
     }
 
     it{
-      @file_entity.merge
+      @file_entity.send(:merge)
       @file_entity.save
 
       expect {
@@ -71,7 +72,7 @@ describe FilePartUpload do
         @file_size = File.size(@image_path)
         @blob = File.new(File.join(@data_path,'1/image'))
 
-        @file_entity = FilePartUpload::FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
+        @file_entity = FilePartUpload::FileEntity.new(:original => file_name, :file_size => @file_size)
         @file_entity.save
       }
 
@@ -92,34 +93,34 @@ describe FilePartUpload do
 
       it{
         @file_entity.save_blob(@blob)
-        @file_entity.attach_file_name.should == 'image.jpg'
-        @file_entity.saved_file_name.should_not == 'image.jpg'
-        File.extname(@file_entity.saved_file_name).should == '.jpg'
+        @file_entity.original.should == 'image.jpg'
+        @file_entity.token.should_not == 'image.jpg'
+        File.extname(@file_entity.token).should == '.jpg'
       }
 
       it{
         @file_entity.save_blob(@blob)
-        File.exists?(@file_entity.attach.path).should == true
+        File.exists?(@file_entity.path).should == true
         dir = File.join(FilePartUpload.root, "file_part_upload/file_entities/#{@file_entity.id}/attach")
 
-        File.dirname(@file_entity.attach.path).should == dir
-        File.basename(@file_entity.attach.path).should_not == 'image.jpg'
+        File.dirname(@file_entity.path).should == dir
+        File.basename(@file_entity.path).should_not == 'image.jpg'
       }
 
       it{
         @file_entity.save_blob(@blob)
         url_dir = File.join("/file_part_upload/file_entities/#{@file_entity.id}/attach")
-        File.dirname(@file_entity.attach.url).should == url_dir
+        File.dirname(@file_entity.url).should == url_dir
       }
 
       it{
         @file_entity.save_blob(@blob)
-        @file_entity.attach.size.should == @file_size
+        @file_entity.file_size.should == @file_size
       }
 
       it{
         @file_entity.save_blob(@blob)
-        @file_entity.attach.content_type.should == "image/jpeg"
+        @file_entity.mime.should == "image/jpeg"
       }
     end
 
@@ -130,7 +131,7 @@ describe FilePartUpload do
         @blob_1 = File.new(File.join(@data_path,'2/image_split_aa'))
         @blob_2 = File.new(File.join(@data_path,'2/image_split_ab'))
 
-        @file_entity = FilePartUpload::FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
+        @file_entity = FilePartUpload::FileEntity.new(:original => file_name, :file_size => @file_size)
         @file_entity.save
       }
 
@@ -159,19 +160,19 @@ describe FilePartUpload do
       it{
         @file_entity.save_blob(@blob_1)
         @file_entity.save_blob(@blob_2)
-        File.exists?(@file_entity.attach.path).should == true
+        File.exists?(@file_entity.path).should == true
       }
 
       it{
         @file_entity.save_blob(@blob_1)
         @file_entity.save_blob(@blob_2)
-        @file_entity.attach.size.should == @file_size
+        @file_entity.file_size.should == @file_size
       }
 
       it{
         @file_entity.save_blob(@blob_1)
         @file_entity.save_blob(@blob_2)
-        @file_entity.attach.content_type.should == "image/jpeg"
+        @file_entity.mime.should == "image/jpeg"
       }
     end
 
@@ -183,7 +184,7 @@ describe FilePartUpload do
         @blob_2 = File.new(File.join(@data_path,'3/image_split_ab'))
         @blob_3 = File.new(File.join(@data_path,'3/image_split_ac'))
 
-        @file_entity = FilePartUpload::FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
+        @file_entity = FilePartUpload::FileEntity.new(:original => file_name, :file_size => @file_size)
         @file_entity.save
       }
 
@@ -221,21 +222,21 @@ describe FilePartUpload do
         @file_entity.save_blob(@blob_1)
         @file_entity.save_blob(@blob_2)
         @file_entity.save_blob(@blob_3)
-        File.exists?(@file_entity.attach.path).should == true
+        File.exists?(@file_entity.path).should == true
       }
 
       it{
         @file_entity.save_blob(@blob_1)
         @file_entity.save_blob(@blob_2)
         @file_entity.save_blob(@blob_3)
-        @file_entity.attach.size.should == @file_size
+        @file_entity.file_size.should == @file_size
       }
 
       it{
         @file_entity.save_blob(@blob_1)
         @file_entity.save_blob(@blob_2)
         @file_entity.save_blob(@blob_3)
-        @file_entity.attach.content_type.should == "image/jpeg"
+        @file_entity.mime.should == "image/jpeg"
       }
     end
 
@@ -265,7 +266,7 @@ describe FilePartUpload do
             :tempfile => @file_blob_3
         })
 
-        @file_entity = FilePartUpload::FileEntity.new(:attach_file_name => file_name, :attach_file_size => @file_size)
+        @file_entity = FilePartUpload::FileEntity.new(:original => file_name, :file_size => @file_size)
         @file_entity.save
       }
 
@@ -303,147 +304,24 @@ describe FilePartUpload do
         @file_entity.save_blob(@blob_1)
         @file_entity.save_blob(@blob_2)
         @file_entity.save_blob(@blob_3)
-        File.exists?(@file_entity.attach.path).should == true
+        File.exists?(@file_entity.path).should == true
       }
 
       it{
         @file_entity.save_blob(@blob_1)
         @file_entity.save_blob(@blob_2)
         @file_entity.save_blob(@blob_3)
-        @file_entity.attach.size.should == @file_size
+        @file_entity.file_size.should == @file_size
       }
 
       it{
         @file_entity.save_blob(@blob_1)
         @file_entity.save_blob(@blob_2)
         @file_entity.save_blob(@blob_3)
-        @file_entity.attach.content_type.should == "image/jpeg"
+        @file_entity.mime.should == "image/jpeg"
       }
 
     end
-  end
-
-  describe '一次上传整个文件' do
-    before(:each){
-      file_name = File.basename(@image_path)
-      @file_size = File.size(@image_path)
-      @image = File.new(@image_path)
-      @file_entity = FilePartUpload::FileEntity.new(:attach => @image)
-      @file_entity.save
-    }
-
-    it{
-      @file_entity.id.blank?.should == false
-    }
-
-    it{
-      @file_entity.uploaded?.should == true
-      @file_entity.uploading?.should == false
-    }
-
-    it{
-      File.exists?(@file_entity.attach.path).should == true
-    }
-
-    it{
-      @file_entity.attach.size.should == @file_size
-    }
-
-    it{
-      @file_entity.attach.content_type.should == "image/jpeg"
-    }
-
-    it{
-      @file_entity.attach_file_name.should == 'image.jpg'
-      @file_entity.saved_file_name.should_not == 'image.jpg'
-      File.extname(@file_entity.saved_file_name).should == '.jpg'
-      File.basename(@file_entity.attach.path).should_not == 'image.jpg'
-    }
-  end
-
-  describe '模仿 rails 表单 一次上传整个文件' do
-    before(:each){
-      @file_size = File.size(@image_path)
-      image_file = File.new(@image_path)
-      @image = ActionDispatch::Http::UploadedFile.new({
-          :filename => 'image.jpg',
-          :type => '',
-          :tempfile => image_file
-      })
-
-      @file_entity = FilePartUpload::FileEntity.new(:attach => @image)
-      @file_entity.save
-    }
-
-    it{
-      @file_entity.id.blank?.should == false
-    }
-
-    it{
-      @file_entity.uploaded?.should == true
-      @file_entity.uploading?.should == false
-    }
-
-    it{
-      File.exists?(@file_entity.attach.path).should == true
-    }
-
-    it{
-      @file_entity.attach.size.should == @file_size
-    }
-
-    it{
-      @file_entity.attach.content_type.should == "image/jpeg"
-    }
-
-    it{
-      @file_entity.attach_file_name.should == 'image.jpg'
-      @file_entity.saved_file_name.should_not == 'image.jpg'
-      File.basename(@file_entity.attach.path).should_not == 'image.jpg'
-      File.extname(@file_entity.saved_file_name).should == '.jpg'
-    }
-  end
-
-  describe '文件没有扩展名' do
-    before(:each){
-      image_file = File.new(File.join(@data_path,'1/image'))
-
-      @image = ActionDispatch::Http::UploadedFile.new({
-          :filename => 'image',
-          :type => '',
-          :tempfile => image_file
-      })
-
-      @file_entity = FilePartUpload::FileEntity.new(:attach => @image)
-      @file_entity.save
-    }
-
-    it{
-      @file_entity.attach_content_type.should == 'application/octet-stream'
-    }
-
-    it{
-      File.exists?(@file_entity.attach.path).should == true
-      dir = File.join(FilePartUpload.root, "file_part_upload/file_entities/#{@file_entity.id}/attach")
-
-      File.dirname(@file_entity.attach.path).should == dir
-      File.basename(@file_entity.attach.path).should_not == 'image'
-      File.extname(@file_entity.attach.path).should == ''
-      @file_entity.attach.path[-1].should_not == '.'
-    }
-
-
-    it{
-      @file_entity.attach_file_name.should == 'image'
-      @file_entity.saved_file_name.should_not == 'image'
-      File.extname(@file_entity.saved_file_name).should == ''
-      File.basename(@file_entity.attach.path).should_not == 'image'
-    }
-
-    it{
-      url_dir = File.join("/file_part_upload/file_entities/#{@file_entity.id}/attach")
-      File.dirname(@file_entity.attach.url).should == url_dir
-    }
   end
 
 end

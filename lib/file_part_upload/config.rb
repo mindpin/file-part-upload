@@ -16,6 +16,14 @@ module FilePartUpload
       FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
     end
 
+    def self.mode(str)
+      sym = str.to_sym
+      raise "mode 只支持 :local 或 :qiniu" if ![:qiniu, :local].include?(sym)
+      config = FilePartUpload.file_part_upload_config
+      config[:mode] = sym
+      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
+    end
+
     #######
     def self.image_version(version_name, &block)
       config = FilePartUpload.file_part_upload_config

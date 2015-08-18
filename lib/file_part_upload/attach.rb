@@ -1,3 +1,8 @@
+# 待删除
+# 待删除
+# 待删除
+# 待删除
+# 待删除
 module FilePartUpload
   class Attach
     def initialize(options)
@@ -6,7 +11,7 @@ module FilePartUpload
       @size    = options[:size]
 
 
-      file_part_upload_config = FilePartUpload.file_part_upload_config 
+      file_part_upload_config = FilePartUpload.file_part_upload_config
 
 
       @path_config = file_part_upload_config[:path] ||
@@ -44,7 +49,7 @@ module FilePartUpload
     end
 
     private
-    # "file_part_upload/:class/:id/attach/:name" 
+    # "file_part_upload/:class/:id/attach/:name"
     # =>
     # "file_part_upload/file_entity/1/attach/xxx.jpg"
     def _convert_path(config_string, version = nil)
@@ -61,7 +66,7 @@ module FilePartUpload
         config_string = config_string.gsub(':name', "#{version}_#{@name}" )
       end
 
-      config_string      
+      config_string
     end
 
   end
