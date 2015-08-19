@@ -1,0 +1,9 @@
+.new
+  = form_tag "/file_part_upload/file_entities/upload", :method => :post, :multipart => true do
+
+    = file_field_tag :blob
+    = text_field_tag :file_name
+    = text_field_tag :file_size
+    = text_field_tag :start_byte
+    = text_field_tag :file_entity_id
+    = submit_tag "submit"

@@ -40,6 +40,15 @@ module FilePartUpload
       file_part_upload_config[:qiniu_bucket]
     end
 
+
+    def get_qiniu_app_access_key
+      file_part_upload_config[:qiniu_app_access_key]
+    end
+
+    def get_qiniu_app_secret_key
+      file_part_upload_config[:qiniu_app_secret_key]
+    end
+
   end
 
 end
@@ -59,10 +68,13 @@ require 'file_part_upload/util'
 require 'file_part_upload/error'
 require 'file_part_upload/file_entity'
 require 'file_part_upload/config'
-require 'file_part_upload/controller_helper'
 require 'file_part_upload/office_helper'
 
 require 'file_part_upload/module_loader'
+
+require "file_part_upload/local_controller_methods"
+require "file_part_upload/qiniu_controller_methods"
+
 require 'file_part_upload/qiniu_validate'
 require 'file_part_upload/qiniu_create_methods'
 require 'file_part_upload/qiniu_methods'

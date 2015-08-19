@@ -42,6 +42,19 @@ module FilePartUpload
       FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
     end
 
+    def self.qiniu_app_access_key(qiniu_app_access_key)
+      config = FilePartUpload.file_part_upload_config
+      config[:qiniu_app_access_key] = qiniu_app_access_key
+      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
+    end
+
+    def self.qiniu_app_secret_key(qiniu_app_secret_key)
+      config = FilePartUpload.file_part_upload_config
+      config[:qiniu_app_secret_key] = qiniu_app_secret_key
+      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
+    end
+
+
     #######
     def self.image_version(version_name, &block)
       config = FilePartUpload.file_part_upload_config
