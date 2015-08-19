@@ -5,6 +5,8 @@ describe 'resize' do
     before{
       FilePartUpload.config do
         path '/tmp/xxx/:id/file/:name'
+        url  nil
+        mode :local
 
         image_version :large do
           process :resize_to_fill => [180, 180]
@@ -21,7 +23,7 @@ describe 'resize' do
         end
       end
     }
-    
+
     it{
       image_versions = FilePartUpload.file_part_upload_config[:image_versions]
       image_versions.should == [
@@ -35,27 +37,33 @@ describe 'resize' do
 
   describe "version" do
     before{
+      file_name = "image.jpg"
       data_path = File.expand_path("../data",__FILE__)
-      image_path = File.join(data_path, "image.jpg")
+      image_path = File.join(data_path, file_name)
       file = File.new(image_path)
-      @entity = FilePartUpload::FileEntity.create(:attach => file)
+      @entity = FilePartUpload::FileEntity.create(:original => file_name, :file_size => file.size)
+      @entity.save_blob(file)
     }
 
     it{
-      name = @entity.attach.path.match(/file\/(.*)\.jpg/)[1]
-      @entity.attach.path(:xxx).match(/file\/xxx_#{name}\.jpg/).class.should == MatchData
-      @entity.attach.path(:normal).match(/file\/normal_#{name}\.jpg/).class.should == MatchData
+      name = @entity.path.match(/file\/(.*)\.jpg/)[1]
+      @entity.path(:xxx).match(/file\/xxx_#{name}\.jpg/).class.should == MatchData
+      @entity.path(:normal).match(/file\/normal_#{name}\.jpg/).class.should == MatchData
 
-      @entity.attach.url.match(/file\/#{name}\.jpg/).class.should == MatchData
-      @entity.attach.url(:xxx).match(/file\/xxx_#{name}\.jpg/).class.should == MatchData
-      @entity.attach.url(:normal).match(/file\/normal_#{name}\.jpg/).class.should == MatchData
+      @entity.url.match(/file\/#{name}\.jpg/).class.should == MatchData
+      @entity.url(:xxx).match(/file\/xxx_#{name}\.jpg/).class.should == MatchData
+      @entity.url(:normal).match(/file\/normal_#{name}\.jpg/).class.should == MatchData
     }
 
-    it{
+    it '上传非图片类型的文件，不会对文件进行图片缩放操作' do
+      file_name = "text.txt"
       data_path = File.expand_path("../data",__FILE__)
-      image_path = File.join(data_path, "text.txt")
+      image_path = File.join(data_path, file_name)
       file = File.new(image_path)
-      @entity = FilePartUpload::FileEntity.create!(:attach => file)
-    }
+      @entity = FilePartUpload::FileEntity.create!(:original => file_name, :file_size => file.size)
+      @entity.save_blob(file)
+      File.exists?(@entity.path).should == true
+      File.exists?(@entity.path(:xxx)).should == false
+    end
   end
 end
