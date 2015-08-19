@@ -1,10 +1,6 @@
 module FilePartUpload
   module LocalValidate
     def self.included(base)
-      base.validates :original,    :presence => true
-      base.validates :file_size,   :presence => true
-      base.validates :mime,        :presence => true
-      base.validates :kind,        :presence => true
       base.validates :saved_size,  :presence => true
 
       base.before_validation :set_default_saved_size

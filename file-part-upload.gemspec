@@ -30,4 +30,5 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'mime-types'
   spec.add_runtime_dependency 'mini_magick'
+  spec.add_runtime_dependency 'enumerize'
 end

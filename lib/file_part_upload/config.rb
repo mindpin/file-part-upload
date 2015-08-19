@@ -24,6 +24,24 @@ module FilePartUpload
       FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
     end
 
+    def self.qiniu_bucket(qiniu_bucket)
+      config = FilePartUpload.file_part_upload_config
+      config[:qiniu_bucket] = qiniu_bucket
+      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
+    end
+
+    def self.qiniu_domain(qiniu_domain)
+      config = FilePartUpload.file_part_upload_config
+      config[:qiniu_domain] = qiniu_domain
+      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
+    end
+
+    def self.qiniu_base_path(qiniu_base_path)
+      config = FilePartUpload.file_part_upload_config
+      config[:qiniu_base_path] = qiniu_base_path
+      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
+    end
+
     #######
     def self.image_version(version_name, &block)
       config = FilePartUpload.file_part_upload_config

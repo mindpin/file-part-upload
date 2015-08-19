@@ -1,5 +1,3 @@
-
-
 module FilePartUpload
 
   class << self
@@ -8,6 +6,9 @@ module FilePartUpload
     def config(&block)
       # 读取配置
       FilePartUpload::Config.config(&block)
+
+      # 根据 mode 加载不同的模块
+      FilePartUpload::ModuleLoader.load_by_mode!
     end
 
     def file_part_upload_config
@@ -27,10 +28,23 @@ module FilePartUpload
       File.join("/", url_config)
     end
 
+    def get_qiniu_domain
+      file_part_upload_config[:qiniu_domain]
+    end
+
+    def get_qiniu_base_path
+      file_part_upload_config[:qiniu_base_path]
+    end
+
+    def get_qiniu_bucket
+      file_part_upload_config[:qiniu_bucket]
+    end
+
   end
 
 end
 
+require 'enumerize'
 # 引用 rails engine
 require 'file_part_upload/engine'
 require 'file_part_upload/mini_magick'
@@ -47,3 +61,8 @@ require 'file_part_upload/file_entity'
 require 'file_part_upload/config'
 require 'file_part_upload/controller_helper'
 require 'file_part_upload/office_helper'
+
+require 'file_part_upload/module_loader'
+require 'file_part_upload/qiniu_validate'
+require 'file_part_upload/qiniu_create_methods'
+require 'file_part_upload/qiniu_methods'
