@@ -122,6 +122,12 @@ describe FilePartUpload do
         @file_entity.save_blob(@blob)
         @file_entity.mime.should == "image/jpeg"
       }
+
+      it{
+        @file_entity.save_blob(@blob)
+        file_entity = FilePartUpload::FileEntity.find(@file_entity.id)
+        file_entity.file_size.should == @blob.size
+      }
     end
 
     describe '文件分段数量是二' do
