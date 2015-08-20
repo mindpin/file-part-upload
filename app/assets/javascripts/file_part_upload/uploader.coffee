@@ -1,27 +1,28 @@
-# qiniu
-# 需要的 data
-# qiniu_domain qiniu_base_path qiniu_uptoken_url
+# options
+# browse_button: 上传按钮
+# dragdrop_area: 接收文件拖拽的区域
+# file_progress: 处理上传进度的回调类
 
-# local
+class FilePartUploader
+  constructor: (options)->
+    @$browse_button = options["browse_button"]
+    @$drag_area_ele = options["dragdrop_area"]
+    @$file_progress = options["file_progress"] || FilePartUploaderFileProgress
 
-class Uploader
-  constructor: (@$browse_button, @$drag_area_ele)->
-    data         = @$browse_button.data()
-    console.log data
-
-    if "qiniu" == data["mode"]
-      @_init_qiniu()
-
-    if "local" == data["mode"]
-      @_init_local()
-
-  _init_local: ()->
-    data         = @$browse_button.data()
-    console.log data
-    @local_upload_url = data['localUploadUrl']
+    @dom_data = @$browse_button.data()
+    console.log @dom_data
 
     # 上传进度显示对象
     @file_progresses = {}
+
+    if "qiniu" == @dom_data["mode"]
+      @_init_qiniu()
+
+    if "local" == @dom_data["mode"]
+      @_init_local()
+
+  _init_local: ()->
+    @local_upload_url = @dom_data['localUploadUrl']
 
     @local_upload = new plupload.Uploader
       runtimes: 'html5,flash,html4'
@@ -47,7 +48,7 @@ class Uploader
         params.start_byte = file.offset
         params.file_entity_id = null
         if not @file_progresses[file.id]?
-          @file_progresses[file.id] = new FileProgress(file, up)
+          @file_progresses[file.id] = new @$file_progress(file, up)
       up.start()
 
     @local_upload.bind "ChunkUploaded", (up, file, response)=>
@@ -64,7 +65,7 @@ class Uploader
     @local_upload.bind "BeforeUpload", (up, file)=>
       console.debug 'before upload'
       if not @file_progresses[file.id]?
-        @file_progresses[file.id] = new FileProgress(file, up)
+        @file_progresses[file.id] = new @$file_progress(file, up)
 
         # 该方法第三个被触发，上传结束前持续被触发
     @local_upload.bind "UploadProgress", (up, file)=>
@@ -85,8 +86,8 @@ class Uploader
       @file_progresses[err.file.id].error()
 
     # 该方法在整个队列处理完毕后触发
-    @local_upload.bind "UploadComplete", ->
-      FileProgress.alldone()
+    @local_upload.bind "UploadComplete", =>
+      @$file_progress.alldone()
 
     # 注册图片粘贴事件
     new PasteImage (file)=>
@@ -96,14 +97,9 @@ class Uploader
 
 
   _init_qiniu: ()->
-    data         = @$browse_button.data()
-    console.log data
-    @qiniu_domain      = data['qiniuDomain']
-    @qiniu_base_path   = data['qiniuBasePath']
-    @qiniu_uptoken_url = data['qiniuUptokenUrl']
-
-    # 上传进度显示对象
-    @file_progresses = {}
+    @qiniu_domain      = @dom_data['qiniuDomain']
+    @qiniu_base_path   = @dom_data['qiniuBasePath']
+    @qiniu_uptoken_url = @dom_data['qiniuUptokenUrl']
 
     @qiniu = Qiniu.uploader
       runtimes: 'html5,flash,html4'
@@ -136,7 +132,7 @@ class Uploader
         BeforeUpload: (up, file)=>
           console.debug 'before upload'
           if not @file_progresses[file.id]?
-            @file_progresses[file.id] = new FileProgress(file, up)
+            @file_progresses[file.id] = new @$file_progress(file, up)
 
         # 该方法第三个被触发，上传结束前持续被触发
         UploadProgress: (up, file)=>
@@ -161,11 +157,11 @@ class Uploader
           console.debug 'many files'
           plupload.each files, (file)=>
             if not @file_progresses[file.id]?
-              @file_progresses[file.id] = new FileProgress(file, up)
+              @file_progresses[file.id] = new @$file_progress(file, up)
 
         # 该方法在整个队列处理完毕后触发
-        UploadComplete: ->
-          FileProgress.alldone()
+        UploadComplete: =>
+          @$file_progress.alldone()
 
     # 注册图片粘贴事件
     new PasteImage (file)=>
@@ -177,7 +173,7 @@ class Uploader
   用于显示上传进度的类
   里面规定了上传进度如何被显示的一些方法
 ###
-class FileProgress
+class FilePartUploaderFileProgress
   constructor: (qiniu_uploading_file, @uploader)->
     @file = qiniu_uploading_file
     console.log @file
@@ -200,9 +196,4 @@ class FileProgress
   @alldone: ->
     console.log "alldone"
 
-
-jQuery(document).on 'ready page:load', ->
-  if jQuery('.btn-upload').length
-    $browse_button = jQuery('.btn-upload')
-    $dragdrop_area = jQuery(document.body)
-    new Uploader($browse_button, $dragdrop_area)
+window.FilePartUploader = FilePartUploader
