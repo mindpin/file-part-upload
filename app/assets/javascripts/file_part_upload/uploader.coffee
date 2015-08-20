@@ -126,7 +126,7 @@ class FilePartUploader
         Key: (up, file)=>
           ext = file.name.split(".").pop()
           ext = ext.toLowerCase()
-          "/#{@qiniu_base_path}/#{jQuery.randstr()}.#{ext}"
+          "#{@qiniu_base_path}/#{jQuery.randstr()}.#{ext}"
 
         # 该方法第二个被触发
         BeforeUpload: (up, file)=>

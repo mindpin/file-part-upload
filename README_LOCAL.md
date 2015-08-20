@@ -6,7 +6,7 @@ Gemfile
 ```ruby
 gem 'file-part-upload',
   :github => "mindpin/file-part-upload",
-  :tag    => "2.0.0-beta1"
+  :tag    => "2.0.0-beta2"
 ```
 
 config/routes.rb  
