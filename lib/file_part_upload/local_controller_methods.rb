@@ -13,6 +13,13 @@ module FilePartUpload
     #             blob : #### form_data ####
 
     def upload
+      # plupload 组建不能修改文件片段参数名，只能是 file
+      # 但是控制器按照 blob 参数处理的
+      # 要把 blob 改为 file
+      # 需要改 文档 测试 页面
+      # TODO
+      params[:blob] = params[:file]
+
       # 不允许上传零字节文件
       if params[:file_size] == 0 || (params[:blob] && params[:blob].size == 0)
         render :text => 'cannot upload a empty file.', :status => 415
@@ -34,6 +41,8 @@ module FilePartUpload
     rescue FilePartUpload::AlreadyMergedError
       render :text => 'file already merged.', :status => 500
     rescue Exception => ex
+      p ex
+      puts ex.backtrace*"/n"
       render :text => 'params or other error.', :status => 500
     end
 

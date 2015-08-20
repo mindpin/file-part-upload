@@ -42,6 +42,18 @@ module FilePartUpload
       FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
     end
 
+    def self.qiniu_uptoken_url(qiniu_uptoken_url)
+      config = FilePartUpload.file_part_upload_config
+      config[:qiniu_uptoken_url] = qiniu_uptoken_url
+      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
+    end
+
+    def self.qiniu_callback_host(qiniu_callback_host)
+      config = FilePartUpload.file_part_upload_config
+      config[:qiniu_callback_host] = qiniu_callback_host
+      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
+    end
+
     def self.qiniu_app_access_key(qiniu_app_access_key)
       config = FilePartUpload.file_part_upload_config
       config[:qiniu_app_access_key] = qiniu_app_access_key

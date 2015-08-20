@@ -1,0 +1,12 @@
+development:
+  sessions:
+    default:
+      database: file-part-upload_dev
+      hosts:
+        - localhost:27017
+test:
+  sessions:
+    default:
+      database: file-part-upload_test
+      hosts:
+        - localhost:27017

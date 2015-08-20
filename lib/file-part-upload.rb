@@ -15,6 +15,12 @@ module FilePartUpload
       self.instance_variable_get(:@file_part_upload_config) || {}
     end
 
+    def set_mount_prefix(mount_prefix)
+      config = FilePartUpload.file_part_upload_config
+      config[:mount_prefix] = mount_prefix
+      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
+    end
+
     def get_mode
       file_part_upload_config[:mode] || :local
     end
@@ -40,6 +46,13 @@ module FilePartUpload
       file_part_upload_config[:qiniu_bucket]
     end
 
+    def get_mount_prefix
+      file_part_upload_config[:mount_prefix]
+    end
+
+    def get_qiniu_callback_host
+      file_part_upload_config[:qiniu_callback_host]
+    end
 
     def get_qiniu_app_access_key
       file_part_upload_config[:qiniu_app_access_key]
@@ -47,6 +60,29 @@ module FilePartUpload
 
     def get_qiniu_app_secret_key
       file_part_upload_config[:qiniu_app_secret_key]
+    end
+
+    def get_qiniu_callback_url
+      File.join(get_qiniu_callback_host, get_mount_prefix, "/file_entities")
+    end
+
+    # 获取页面上需要给上传按钮设置的 data
+    def get_dom_data
+      if :qiniu == get_mode
+        {
+          :mode              => get_mode,
+          :qiniu_domain      => get_qiniu_domain,
+          :qiniu_base_path   => get_qiniu_base_path,
+          :qiniu_uptoken_url => File.join(get_mount_prefix, "/file_entities/uptoken"),
+          :qiniu_callback_url => get_qiniu_callback_url
+        }
+      else
+        {
+          :mode             => get_mode,
+          :local_upload_url => File.join(get_mount_prefix, "/file_entities/upload")
+        }
+      end
+
     end
 
   end
@@ -78,3 +114,5 @@ require "file_part_upload/qiniu_controller_methods"
 require 'file_part_upload/qiniu_validate'
 require 'file_part_upload/qiniu_create_methods'
 require 'file_part_upload/qiniu_methods'
+
+require 'file_part_upload/rails_routes'
