@@ -20,6 +20,8 @@ module FilePartUpload
         # set kind
         new_kind  = new_mime.split("/").first
         self.kind = new_kind if new_kind != self.kind
+
+        self.kind = "video" if new_kind == "application/mp4"
       end
     end
 

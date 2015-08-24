@@ -90,6 +90,8 @@ module FilePartUpload
 end
 
 require 'enumerize'
+require 'streamio-ffmpeg'
+require "mini_magick"
 # 引用 rails engine
 require 'file_part_upload/engine'
 require 'file_part_upload/mini_magick'

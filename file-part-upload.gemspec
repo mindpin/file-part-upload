@@ -32,4 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'mini_magick'
   spec.add_runtime_dependency 'enumerize'
   spec.add_runtime_dependency 'qiniu', '~> 6.4.1'
+  spec.add_runtime_dependency 'streamio-ffmpeg'
 end

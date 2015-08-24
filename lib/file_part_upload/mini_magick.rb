@@ -1,5 +1,3 @@
-require "mini_magick"
-
 module FilePartUpload
   class MiniMagick
     def self.resize!(attach)
