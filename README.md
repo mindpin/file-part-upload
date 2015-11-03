@@ -11,7 +11,7 @@ file_entity = FilePartUpload.last
 file_entity.path
 
 # 文件 url
-file_entity.url
+file_entity.url(version = nil)
 
 # 文件 大小
 file_entity.file_size

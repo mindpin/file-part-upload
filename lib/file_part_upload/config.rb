@@ -69,6 +69,22 @@ module FilePartUpload
 
     #######
     def self.image_version(version_name, &block)
+      self._local_image_version(version_name, &block)
+      self._qiniu_image_version(version_name, &block)
+    end
+
+    def self._qiniu_image_version(version_name, &block)
+      config = FilePartUpload.file_part_upload_config
+      config[:qiniu_image_versions] ||= {}
+      process_type, process_args = self.instance_eval &block
+      config[:qiniu_image_versions][version_name.to_s] = {
+        :type => process_type.to_s,
+        :args => process_args
+      }
+      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
+    end
+
+    def self._local_image_version(version_name, &block)
       config = FilePartUpload.file_part_upload_config
       config[:image_versions] ||= []
       process_type, process_args = self.instance_eval &block
@@ -85,6 +101,7 @@ module FilePartUpload
       return :resize_to_fill, process_attr[:resize_to_fill] if !!process_attr[:resize_to_fill]
       return :resize_to_fit, process_attr[:resize_to_fit] if !!process_attr[:resize_to_fit]
     end
+
     #######
 
     def self.add_methods(_module)

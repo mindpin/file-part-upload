@@ -2,3 +2,5 @@ log
 tmp
 Gemfile.lock
 public/*
+*.jpg
+*.doc

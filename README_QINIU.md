@@ -34,6 +34,20 @@ FilePartUpload.config do
   qiniu_app_access_key "xxx"
   qiniu_app_secret_key "xxx"
   qiniu_callback_host  "http://yy.yy.yy"
+
+  image_version :large do
+    process :resize_to_fill => [180, 180]
+  end
+  image_version :normal do
+    process :resize_to_fill => [64, 63]
+  end
+  image_version :small do
+    process :resize_to_fill => [30, 32]
+  end
+
+  image_version :xxx do
+    process :resize_to_fit => [30, 31]
+  end
 end
 ```
 
