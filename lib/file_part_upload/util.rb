@@ -23,5 +23,21 @@ module FilePartUpload
       re
     end
 
+    def self.put_to_qiniu_transcode_queue(qiniu_bucket, origin_key, transcode_key, fops)
+      code = Qiniu::Utils.urlsafe_base64_encode("#{qiniu_bucket}:#{transcode_key}")
+
+      _, result = Qiniu::Fop::Persistance.pfop(
+        bucket: qiniu_bucket,
+        key: origin_key,
+        fops: "#{fops}|saveas/#{code}"
+      )
+      return result["persistentId"]
+    end
+
+    def self.get_qiniu_transcode_status(persistance_id)
+      _, result = Qiniu::Fop::Persistance.prefop(persistance_id)
+      return result["code"]
+    end
+
   end
 end

@@ -62,6 +62,18 @@ module FilePartUpload
       file_part_upload_config[:qiniu_app_secret_key]
     end
 
+    def get_image_versions
+      file_part_upload_config[:image_versions]
+    end
+
+    def get_qiniu_image_versions
+      file_part_upload_config[:qiniu_image_versions]
+    end
+
+    def get_qiniu_audio_and_video_transcode
+      file_part_upload_config[:qiniu_audio_and_video_transcode]
+    end
+
     def get_qiniu_callback_url
       File.join(get_qiniu_callback_host, get_mount_prefix, "/file_entities")
     end
@@ -116,5 +128,6 @@ require "file_part_upload/qiniu_controller_methods"
 require 'file_part_upload/qiniu_validate'
 require 'file_part_upload/qiniu_create_methods'
 require 'file_part_upload/qiniu_methods'
+require 'file_part_upload/transcoding_record'
 
 require 'file_part_upload/rails_routes'
