@@ -23,5 +23,43 @@ module FilePartUpload
       re
     end
 
+    def self.human_file_size(file_size)
+      return "#{file_size} B" if file_size < 1024
+
+      [
+        [1024,      "B"],
+        [1024 ** 2, "KB"],
+        [1024 ** 3, "M"],
+        [1024 ** 4, "G"],
+        [1024 ** 5, "T"],
+        [1024 ** 6, "P"],
+        [1024 ** 7, "E"],
+        [1024 ** 8, "Z"],
+        [1024 ** 9, "Y"]
+      ].each do |arg|
+        if file_size < arg[0]
+          return sprintf(sprintf("%.2f #{arg[1]}", file_size / (arg[0] / 1024 + 0.0)))
+        end
+      end
+
+      file_size
+    end
+
+    def self.put_to_qiniu_transcode_queue(qiniu_bucket, origin_key, transcode_key, fops)
+      code = Qiniu::Utils.urlsafe_base64_encode("#{qiniu_bucket}:#{transcode_key}")
+
+      _, result = Qiniu::Fop::Persistance.pfop(
+        bucket: qiniu_bucket,
+        key: origin_key,
+        fops: "#{fops}|saveas/#{code}"
+      )
+      return result["persistentId"]
+    end
+
+    def self.get_qiniu_transcode_status(persistance_id)
+      _, result = Qiniu::Fop::Persistance.prefop(persistance_id)
+      return result["code"]
+    end
+
   end
 end

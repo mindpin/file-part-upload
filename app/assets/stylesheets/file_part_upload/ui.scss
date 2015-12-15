@@ -1,3 +1,6 @@
+@import "bootstrap-sprockets";
+@import "bootstrap";
+
 body {
   background-color: #fafafa;
   font-family: '微软雅黑', arial;
@@ -13,5 +16,17 @@ body {
     &.current-user {
       color: #FF4400;
     }
+  }
+}
+
+.page-file-entity{
+  margin-top: 50px;
+  background-color: #ffffda;
+  color: #FF4400;
+  font-size: 16px;
+  padding: 15px;
+
+  .info-line{
+    height: 35px;
   }
 }

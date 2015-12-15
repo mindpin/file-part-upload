@@ -1,0 +1,7 @@
+- if @file_entity.kind.audio? || @file_entity.kind.video?
+  %ckplayer
+    %flashvars
+      %video
+        %file= @file_entity.transcode_url
+        %size= @file_entity.file_size
+        %seconds= @file_entity.seconds

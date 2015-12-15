@@ -1,0 +1,21 @@
+- xml_url = FilePartUpload::Engine.routes.url_helpers.file_entity_path(@file_entity, "xml")
+
+.container
+  .row
+    .col-md-8.col-md-offset-2
+      .page-file-entity
+        .row.info-line
+          .col-md-2 文件名
+          .col-md-10= @file_entity.original
+        .row.info-line
+          .col-md-2 文件大小
+          .col-md-10= FilePartUpload::Util.human_file_size @file_entity.file_size
+        .row.info-line
+          .col-md-12
+            %a{:href => @file_entity.download_url} 下载该文件
+        - if @file_entity.kind.audio?
+          .ckplayer{:id => "file_entity_#{@file_entity.id.to_s}", :data => {:xml_url => xml_url, :url => @file_entity.transcode_url}}
+        - if @file_entity.kind.video?
+          .ckplayer{:id => "file_entity_#{@file_entity.id.to_s}", :data => {:xml_url => xml_url, :url => @file_entity.transcode_url}}
+        - if @file_entity.kind.image?
+          %img{:src => @file_entity.url}

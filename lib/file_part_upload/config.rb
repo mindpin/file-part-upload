@@ -66,8 +66,14 @@ module FilePartUpload
       FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
     end
 
+    def self.qiniu_audio_and_video_transcode(action)
+      if action.to_s == "enable"
+        config = FilePartUpload.file_part_upload_config
+        config[:qiniu_audio_and_video_transcode] = "enable"
+        FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
+      end
+    end
 
-    #######
     def self.image_version(version_name, &block)
       self._local_image_version(version_name, &block)
       self._qiniu_image_version(version_name, &block)
@@ -101,8 +107,6 @@ module FilePartUpload
       return :resize_to_fill, process_attr[:resize_to_fill] if !!process_attr[:resize_to_fill]
       return :resize_to_fit, process_attr[:resize_to_fit] if !!process_attr[:resize_to_fit]
     end
-
-    #######
 
     def self.add_methods(_module)
       FilePartUpload::FileEntity.send(:include, _module)
