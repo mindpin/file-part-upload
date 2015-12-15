@@ -9,5 +9,9 @@ module FilePartUpload
       include FilePartUpload::QiniuControllerMethods
     end
 
+    def show
+      @file_entity = FilePartUpload::FileEntity.find params[:id]
+    end
+
   end
 end

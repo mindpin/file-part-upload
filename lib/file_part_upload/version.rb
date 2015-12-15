@@ -1,3 +1,3 @@
 module FilePartUpload
-  VERSION = "2.0.0-beta4"
+  VERSION = "2.1.0"
 end

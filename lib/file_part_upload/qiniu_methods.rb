@@ -15,14 +15,6 @@ module FilePartUpload
       return true
     end
 
-    def is_audio?
-      self.mime.split("/").first == "audio"
-    end
-
-    def is_video?
-      self.mime.split("/").first == "video"
-    end
-
     def transcode_url(transcoding_record_name = "default")
       self.transcoding_records.where(:name => transcoding_record_name).first.try(:url)
     end
@@ -35,6 +27,19 @@ module FilePartUpload
 
     def transcode_info
       self.transcoding_records.map{|tr|[tr.name,tr.get_status.to_s]}.to_h
+    end
+
+    def download_url
+      "#{url}?attname=#{self.original}"
+    end
+
+    def seconds
+      return 0 if !self.kind.audio? && !self.kind.video?
+      meta[self.kind.to_s]["total_duration"].to_i
+    end
+
+    def file_size
+      meta["file_size"]
     end
 
     def url(version = nil)

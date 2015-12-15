@@ -6,7 +6,7 @@ Gemfile
 ```ruby
 gem 'file-part-upload',
   :github => "mindpin/file-part-upload",
-  :tag    => "2.0.0-beta2"
+  :tag    => "2.1.0"
 ```
 
 config/routes.rb  
@@ -56,7 +56,7 @@ end
 
 app/assets/javascripts/application.js  
 ```js
-//= require file_part_upload/application
+//= require file_part_upload/uploader
 //= require uploader
 ```
 
