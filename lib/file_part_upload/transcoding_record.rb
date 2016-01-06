@@ -36,7 +36,10 @@ module FilePartUpload
 
     def refresh_status_form_qiniu
       code = FilePartUpload::Util.get_qiniu_transcode_status(self.quniu_persistance_id)
-
+      update_status_by_code(code)
+    end
+    
+    def update_status_by_code(code)
       case code
       when 0
         self.status = :success
@@ -48,7 +51,7 @@ module FilePartUpload
 
       if self.changed.include?("status")
         self.save
-      end
+      end      
     end
 
 

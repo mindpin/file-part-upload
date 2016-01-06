@@ -4,8 +4,18 @@ module FilePartUpload
       base.has_many :transcoding_records, :class_name => "FilePartUpload::TranscodingRecord"
       base.after_create :process_transcode
     end
+    
+    def is_audio?
+      self.mime.split("/").first == "audio"
+    end
+    
+    def is_video?
+      self.mime.split("/").first == "video"
+    end
 
     def process_transcode
+      return true if FilePartUpload.get_qiniu_audio_and_video_transcode != "enable"
+      
       case self.mime.split("/").first
       when 'audio'
         put_audio_transcode_to_quene
@@ -21,12 +31,12 @@ module FilePartUpload
 
     def transcode_success?
       self.transcoding_records.select do |tr|
-        tr.get_status.to_s != "success"
+        tr.status.to_s != "success"
       end.count == 0
     end
 
     def transcode_info
-      self.transcoding_records.map{|tr|[tr.name,tr.get_status.to_s]}.to_h
+      self.transcoding_records.map{|tr|[tr.name,tr.status.to_s]}.to_h
     end
 
     def download_url

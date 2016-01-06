@@ -47,18 +47,15 @@ module FilePartUpload
 
     def self.put_to_qiniu_transcode_queue(qiniu_bucket, origin_key, transcode_key, fops)
       code       = Qiniu::Utils.urlsafe_base64_encode("#{qiniu_bucket}:#{transcode_key}")
-      notify_url = "http://develop-fushang318.c9users.io/file_part_upload/file_entities/pfop"
-      RestClient.log = $stdout
+      
       _, result = Qiniu::Fop::Persistance.pfop(
         bucket: qiniu_bucket,
         key: origin_key,
         fops: "#{fops}|saveas/#{code}",
-        "notifyURL" => notify_url
+        "notifyURL" => FilePartUpload.get_qiniu_pfop_notify_url
       )
-      p "put_to_qiniu_transcode_queue 111"
-      p _
-      p result
-      return "1"
+      
+      return result["persistentId"]
     end
 
     def self.get_qiniu_transcode_status(persistance_id)
