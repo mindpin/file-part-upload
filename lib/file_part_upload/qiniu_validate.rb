@@ -6,10 +6,8 @@ module FilePartUpload
 
     def set_kind_by_mime
       if self.mime.present?
-        new_kind  = self.mime.split("/").first
+        new_kind = FilePartUpload::Util.get_file_kind_by_mime_type(self.mime)
         self.kind = new_kind if new_kind != self.kind
-
-        self.kind = "video" if self.mime == "application/mp4"
       end
     end
 

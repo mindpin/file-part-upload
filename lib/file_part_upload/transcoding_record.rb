@@ -7,7 +7,7 @@ module FilePartUpload
     field :name,                   type: String
     field :fops,                   type: String
     field :quniu_persistance_id,   type: String
-    field :token,                  type: String
+    field :token
 
     enumerize :status, in: [:processing, :success, :failure], default: :processing
 
@@ -16,11 +16,15 @@ module FilePartUpload
     before_create :send_to_qiniu_queue
     def send_to_qiniu_queue
       self.quniu_persistance_id = FilePartUpload::Util.put_to_qiniu_transcode_queue(
-        FilePartUpload.get_qiniu_bucket,
         self.file_entity.token,
-        self.token,
         self.fops
       )
+    end
+    
+    before_save :put_pdf_transcode_to_quene
+    def put_pdf_transcode_to_quene
+      return true if !self.file_entity.is_office? || self.name != "pdf"
+      
     end
 
     def url
@@ -53,7 +57,6 @@ module FilePartUpload
         self.save
       end      
     end
-
 
 
   end

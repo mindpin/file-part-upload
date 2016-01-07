@@ -5,15 +5,8 @@ module FilePartUpload
       base.after_create :process_transcode
     end
     
-    def is_audio?
-      self.mime.split("/").first == "audio"
-    end
-    
-    def is_video?
-      self.mime.split("/").first == "video"
-    end
-
     def process_transcode
+      # TODO 转码开启关闭的配置方式修改，因为不局限于音频和视频了
       return true if FilePartUpload.get_qiniu_audio_and_video_transcode != "enable"
       
       case self.mime.split("/").first
@@ -21,6 +14,10 @@ module FilePartUpload
         put_audio_transcode_to_quene
       when 'video'
         put_video_transcode_to_quene
+      when 'office'
+        put_office_transcode_to_quene
+      when 'pdf'
+        put_pdf_transcode_to_quene
       end
       return true
     end
@@ -118,7 +115,7 @@ module FilePartUpload
 
       put_video_transcode_to_quene_by_bit_rate(bit_rate.to_i-64000,"64k")
     end
-
+    
     # key 去掉 ext
     def transcode_file_path
       arr = token.split(".")
@@ -128,21 +125,51 @@ module FilePartUpload
 
     def put_video_transcode_to_quene_by_bit_rate(video_bit_rate, audio_bit_rate)
       fops = "avthumb/mp4/vcodec/libx264/vb/#{video_bit_rate}/acodec/libmp3lame/ab/#{audio_bit_rate}"
-      transcode_token = File.join(transcode_file_path, "#{video_bit_rate}.mp4")
-      put_transcode_to_quene(fops, transcode_token)
+      transcode_key = File.join(transcode_file_path, "#{video_bit_rate}.mp4")
+      fops = FilePartUpload::Util.splice_qiniu_saveas_fops_str(fops, transcode_key)
+      put_transcode_to_quene(fops: fops, transcode_key: transcode_key)
     end
 
     # bit_rate -> 128K
     def put_audio_transcode_to_quene_by_bit_rate(bit_rate)
       fops = "avthumb/mp3/acodec/libmp3lame/ab/#{bit_rate}"
-      transcode_token = File.join(transcode_file_path, "#{bit_rate}.mp3")
-      put_transcode_to_quene(fops, transcode_token)
+      transcode_key = File.join(transcode_file_path, "#{bit_rate}.mp3")
+      fops = FilePartUpload::Util.splice_qiniu_saveas_fops_str(fops, transcode_key)
+      put_transcode_to_quene(fops: fops, transcode_key: transcode_key)
     end
 
-    def put_transcode_to_quene(fops, transcode_token)
-      transcoding_record = self.transcoding_records.create(
-        :name  => "default",
-        :token => transcode_token,
+    def put_office_transcode_to_quene
+      fops = "yifangyun_preview/v2/action=get_preview/format=pdf"
+      transcode_key = File.join(transcode_file_path, "transcode.pdf")
+      fops = FilePartUpload::Util.splice_qiniu_saveas_fops_str(fops, transcode_key)
+      put_transcode_to_quene(fops: fops, transcode_key: transcode_key, name: 'pdf')
+    end
+    
+    def put_pdf_transcode_to_quene
+      json_str = RestClient.get("#{self.url}?yifangyun_preview/v2/action=get_page_count").body
+      pdf_page_count = JSON.parse(json_str)["page_count"].to_i
+      
+      self.meta["page_count"] = pdf_page_count
+      self.save
+      
+      transcode_key_list = []
+      fops_list          = []
+      1.upto(pdf_page_count) do |num|
+        fops = "yifangyun_preview/v2/action=get_preview/format=jpg/page_number=#{num}"
+        transcode_key = File.join(transcode_file_path, "#{num}.jpg")
+        fops = FilePartUpload::Util.splice_qiniu_saveas_fops_str(fops, transcode_key)
+        
+        transcode_key_list.push transcode_key
+        fops_list.push fops
+      end
+      
+      put_transcode_to_quene(fops: fops_list.join(";"), transcode_key: transcode_key_list, name: 'jpg')
+    end
+
+    def put_transcode_to_quene(fops:, transcode_key:, name: "default")
+      self.transcoding_records.create(
+        :name  => name,
+        :token => transcode_key,
         :fops      => fops
       )
     end
