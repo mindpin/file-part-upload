@@ -44,21 +44,53 @@ module FilePartUpload
 
       file_size
     end
-
-    def self.put_to_qiniu_transcode_queue(qiniu_bucket, origin_key, transcode_key, fops)
-      code = Qiniu::Utils.urlsafe_base64_encode("#{qiniu_bucket}:#{transcode_key}")
-
+    
+    def self.put_to_qiniu_transcode_queue(origin_key, fops)
+      qiniu_bucket = FilePartUpload.get_qiniu_bucket
+      notify_url   = FilePartUpload.get_qiniu_pfop_notify_url
+      
       _, result = Qiniu::Fop::Persistance.pfop(
         bucket: qiniu_bucket,
         key: origin_key,
-        fops: "#{fops}|saveas/#{code}"
+        fops: fops,
+        "notifyURL" => notify_url
       )
+      
       return result["persistentId"]
+    end
+    
+    def self.splice_qiniu_saveas_fops_str(fops, transcode_key)
+      qiniu_bucket = FilePartUpload.get_qiniu_bucket
+      code = Qiniu::Utils.urlsafe_base64_encode("#{qiniu_bucket}:#{transcode_key}")
+      "#{fops}|saveas/#{code}"
     end
 
     def self.get_qiniu_transcode_status(persistance_id)
       _, result = Qiniu::Fop::Persistance.prefop(persistance_id)
       return result["code"]
+    end
+    
+    
+    OFFICE_MIME_TYPE_LIST = [
+      "text/csv", 
+      "application/msword", 
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", 
+      "application/vnd.ms-powerpoint", 
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation", 
+      "application/rtf", 
+      "application/vnd.ms-excel", 
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ]
+    
+    # TODO 编写测试
+    def self.get_file_kind_by_mime_type(mime_type)
+      kind  = mime_type.split("/").first
+      return kind if ["image", "video", "audio"].include?(kind)
+      
+      return "office" if OFFICE_MIME_TYPE_LIST.include?(mime_type)
+      return "pdf"    if mime_type == "application/pdf"
+      
+      return "application"
     end
 
   end

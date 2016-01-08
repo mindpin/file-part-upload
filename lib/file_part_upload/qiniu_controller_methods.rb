@@ -43,6 +43,15 @@ module FilePartUpload
         :file_entity_url => file_entity.url
       }
     end
+    
+    def pfop
+      # {"id"=>"z0.568b96b67823de14f7626367", "pipeline"=>"0.default", "code"=>0, "desc"=>"The fop was completed successfully", "reqid"=>"7DkAAFGcSwv_fyYU", "inputBucket"=>"fushang318", "inputKey"=>"fpu/GyrkDZW2.mp3", "items"=>[{"cmd"=>"avthumb/mp3/acodec/libmp3lame/ab/128k|saveas/ZnVzaGFuZzMxODpmcHUvR3lya0RaVzIvMTI4ay5tcDM=", "code"=>0, "desc"=>"The fop was completed successfully", "hash"=>"FlaHJmdAh39EEA5d5-cCCt5F8B9a", "key"=>"fpu/GyrkDZW2/128k.mp3", "returnOld"=>0}], "controller"=>"file_part_upload/file_entities", "action"=>"pfop", "file_entity"=>{}}
+      transcoding_record = FilePartUpload::TranscodingRecord.where(:quniu_persistance_id => params[:id]).first
+      if !transcoding_record.blank?
+        transcoding_record.update_status_by_code(params[:code])
+      end
+      render :text => 200, :status => 200
+    end
 
   end
 end

@@ -77,6 +77,10 @@ module FilePartUpload
     def get_qiniu_callback_url
       File.join(get_qiniu_callback_host, get_mount_prefix, "/file_entities")
     end
+    
+    def get_qiniu_pfop_notify_url
+      File.join(get_qiniu_callback_host, get_mount_prefix, "/file_entities/pfop")
+    end
 
     # 获取页面上需要给上传按钮设置的 data
     def get_dom_data

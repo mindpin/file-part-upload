@@ -7,7 +7,7 @@ module FilePartUpload
     field :name,                   type: String
     field :fops,                   type: String
     field :quniu_persistance_id,   type: String
-    field :token,                  type: String
+    field :token
 
     enumerize :status, in: [:processing, :success, :failure], default: :processing
 
@@ -16,15 +16,27 @@ module FilePartUpload
     before_create :send_to_qiniu_queue
     def send_to_qiniu_queue
       self.quniu_persistance_id = FilePartUpload::Util.put_to_qiniu_transcode_queue(
-        FilePartUpload.get_qiniu_bucket,
         self.file_entity.token,
-        self.token,
         self.fops
       )
     end
+    
+    before_save :put_pdf_transcode_to_quene
+    def put_pdf_transcode_to_quene
+      return true if !self.file_entity.is_office? || self.name != "pdf" || !self.status.success?
+      
+      self.file_entity.update_page_count_by_pdf_url(self.url)
+      self.file_entity.put_pdf_transcode_to_quene_by_page_count
+    end
 
     def url
-      File.join(FilePartUpload.get_qiniu_domain, token)
+      File.join(FilePartUpload.get_qiniu_domain, [*token][0])
+    end
+    
+    def urls
+      [*token].map do |t|
+        File.join(FilePartUpload.get_qiniu_domain, t)  
+      end
     end
 
     def get_status
@@ -36,7 +48,10 @@ module FilePartUpload
 
     def refresh_status_form_qiniu
       code = FilePartUpload::Util.get_qiniu_transcode_status(self.quniu_persistance_id)
-
+      update_status_by_code(code)
+    end
+    
+    def update_status_by_code(code)
       case code
       when 0
         self.status = :success
@@ -48,9 +63,8 @@ module FilePartUpload
 
       if self.changed.include?("status")
         self.save
-      end
+      end      
     end
-
 
 
   end

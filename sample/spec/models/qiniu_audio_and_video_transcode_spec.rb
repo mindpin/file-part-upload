@@ -5,8 +5,8 @@ describe 'qiniu_audio_and_video_transcode' do
     module FilePartUpload
       class Util
 
-        def self.put_to_qiniu_transcode_queue(qiniu_bucket, origin_key, transcode_key, fops)
-          return "#{origin_key}_#{transcode_key}_fops"
+        def self.put_to_qiniu_transcode_queue(origin_key, fops)
+          return "#{origin_key}_#{fops}_fops"
         end
 
         def self.get_qiniu_transcode_status(persistance_id)
@@ -98,9 +98,15 @@ describe 'qiniu_audio_and_video_transcode' do
     expect(@file_entity_video.is_audio?).to eq(false)
     expect(@file_entity_video.is_video?).to eq(true)
 
-    expect(@file_entity_video.transcode_success?).to eq(true)
-
+    expect(@file_entity_video.transcode_info).to eq({"default"=>"processing"})
+    expect(@file_entity_video.transcode_success?).to eq(false)
+    
+    @file_entity_video.transcoding_records.each do |tr|
+      tr.refresh_status_form_qiniu
+    end
+    
     expect(@file_entity_video.transcode_info).to eq({"default"=>"success"})
+    expect(@file_entity_video.transcode_success?).to eq(true)
   }
 
   it{
@@ -108,9 +114,16 @@ describe 'qiniu_audio_and_video_transcode' do
 
     expect(@file_entity_audio.is_audio?).to eq(true)
     expect(@file_entity_audio.is_video?).to eq(false)
-    expect(@file_entity_audio.transcode_success?).to eq(true)
 
+    expect(@file_entity_audio.transcode_info).to eq({"default"=>"processing"})
+    expect(@file_entity_audio.transcode_success?).to eq(false)
+    
+    @file_entity_audio.transcoding_records.each do |tr|
+      tr.refresh_status_form_qiniu
+    end
+    
     expect(@file_entity_audio.transcode_info).to eq({"default"=>"success"})
+    expect(@file_entity_audio.transcode_success?).to eq(true)
   }
 
   it{
