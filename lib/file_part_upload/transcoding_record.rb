@@ -23,12 +23,20 @@ module FilePartUpload
     
     before_save :put_pdf_transcode_to_quene
     def put_pdf_transcode_to_quene
-      return true if !self.file_entity.is_office? || self.name != "pdf"
+      return true if !self.file_entity.is_office? || self.name != "pdf" || !self.status.success?
       
+      self.file_entity.update_page_count_by_pdf_url(self.url)
+      self.file_entity.put_pdf_transcode_to_quene_by_page_count
     end
 
     def url
-      File.join(FilePartUpload.get_qiniu_domain, token)
+      File.join(FilePartUpload.get_qiniu_domain, [*token][0])
+    end
+    
+    def urls
+      [*token].map do |t|
+        File.join(FilePartUpload.get_qiniu_domain, t)  
+      end
     end
 
     def get_status

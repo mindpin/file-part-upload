@@ -56,9 +56,6 @@ module FilePartUpload
         "notifyURL" => notify_url
       )
       
-      p "put_to_qiniu_transcode_queu"
-      p _
-      p result
       return result["persistentId"]
     end
     
@@ -66,11 +63,6 @@ module FilePartUpload
       qiniu_bucket = FilePartUpload.get_qiniu_bucket
       code = Qiniu::Utils.urlsafe_base64_encode("#{qiniu_bucket}:#{transcode_key}")
       "#{fops}|saveas/#{code}"
-    end
-
-    def self.get_qiniu_pdf_page_count(pdf_url)
-      json_str = RestClient.get("#{pdf_url}?yifangyun_preview/v2/action=get_page_count").body
-      JSON.parse(json_str)["page_count"].to_i
     end
 
     def self.get_qiniu_transcode_status(persistance_id)
