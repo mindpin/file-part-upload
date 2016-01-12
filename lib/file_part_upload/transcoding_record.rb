@@ -33,7 +33,7 @@ module FilePartUpload
     def record_image_size_by_token_on_transcode_success
       return true if (!self.file_entity.is_office? && !self.file_entity.is_pdf?) || self.name != "jpg" || !self.status.success?
       
-      json_str = RestClient.get("#{self.url[0]}?imageInfo").body
+      json_str = RestClient.get("#{self.url}?imageInfo").body
       self.file_entity.meta["page_width"] = JSON.parse(json_str)["width"].to_i
       self.file_entity.meta["page_height"] = JSON.parse(json_str)["height"].to_i
       self.file_entity.save
