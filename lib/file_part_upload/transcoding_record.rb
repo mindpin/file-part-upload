@@ -29,16 +29,6 @@ module FilePartUpload
       self.file_entity.put_pdf_transcode_to_quene_by_page_count
     end
 
-    before_save :record_image_size_by_token_on_transcode_success
-    def record_image_size_by_token_on_transcode_success
-      return true if (!self.file_entity.is_office? && !self.file_entity.is_pdf?) || self.name != "jpg" || !self.status.success?
-      
-      json_str = RestClient.get("#{self.url[0]}?imageInfo").body
-      self.file_entity.meta["page_width"] = JSON.parse(json_str)["width"].to_i
-      self.file_entity.meta["page_height"] = JSON.parse(json_str)["height"].to_i
-      self.file_entity.save
-    end
-
     def url
       File.join(FilePartUpload.get_qiniu_domain, [*token][0])
     end
