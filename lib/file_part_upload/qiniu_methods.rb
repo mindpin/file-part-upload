@@ -4,11 +4,11 @@ module FilePartUpload
       base.has_many :transcoding_records, :class_name => "FilePartUpload::TranscodingRecord"
       base.after_create :process_transcode
     end
-    
+
     def process_transcode
       # TODO 转码开启关闭的配置方式修改，因为不局限于音频和视频了
       return true if FilePartUpload.get_qiniu_audio_and_video_transcode != "enable"
-      
+
       case self.kind.to_s
       when 'audio'
         put_audio_transcode_to_quene
@@ -25,7 +25,7 @@ module FilePartUpload
     def transcode_url(transcoding_record_name = "default")
       self.transcoding_records.where(:name => transcoding_record_name).first.try(:url)
     end
-    
+
     def transcode_urls(transcoding_record_name)
       self.transcoding_records.where(:name => transcoding_record_name).first.try(:urls)
     end
@@ -97,29 +97,56 @@ module FilePartUpload
     end
 
     def put_video_transcode_to_quene
-      # 完全按照 http://www.youku.com/help/view/fid/8#q20
-      # 的逻辑会很复杂，需要借助一些数据后才能调整
-      # 先用简化的逻辑处理
-      bit_rate = self.meta["video"]["total_bit_rate"]
+      # TODO 需要参考 http://www.youku.com/help/view/fid/8#q20 改进的地方
+      # 1 不同编码源文件需要的视频码率不同，现在的逻辑完全按照假设源文件是 h264 编码来处理的
+      # 2 转码规则修改成配置化的
+      video_bit_rate = self.meta["video"]["video_bit_rate"].to_i
+      video_width    = self.meta["video"]["width"].to_i
+      video_height   = self.meta["video"]["height"].to_i
 
-      if bit_rate.to_i >= 3500000
-        # 转码超清
-        return put_video_transcode_to_quene_by_bit_rate("3.5m", "320k")
+      transcode_params_arr = [
+        {
+          name: "标清",
+          video_width:    640,
+          video_height:   360,
+          video_bit_rate: 230400,
+          audio_bit_rate: 32000
+        },
+        {
+          name: "高清",
+          video_width: 960,
+          video_height: 540,
+          video_bit_rate: 518400,
+          audio_bit_rate: 32000
+        },
+        {
+          name: "超请",
+          video_width: 1280,
+          video_height: 720,
+          video_bit_rate: 921600,
+          audio_bit_rate: 64000
+        }
+      ]
+
+      transcode_params_arr.each do |params|
+        if video_width >= params[:video_width] && video_height >= params[:video_height] && video_bit_rate >= params[:video_bit_rate]
+          put_video_transcode_to_quene_by_bit_rate(params)
+        end
       end
 
-      if bit_rate.to_i >= 1500000
-        # 转码超清
-        return put_video_transcode_to_quene_by_bit_rate("1.5m", "320k")
+      min_params = transcode_params_arr[0]
+      if video_width < min_params[:video_width] || video_height < min_params[:video_height] || video_bit_rate < min_params[:video_bit_rate]
+        put_video_transcode_to_quene_by_bit_rate(
+          name: "低清",
+          video_width: video_width,
+          video_height: video_height,
+          video_bit_rate: video_bit_rate,
+          audio_bit_rate: 32000
+        )
       end
 
-      if bit_rate.to_i >= 1000000
-        # 转码高清
-        return put_video_transcode_to_quene_by_bit_rate("1m","128k")
-      end
-
-      put_video_transcode_to_quene_by_bit_rate(bit_rate.to_i-64000,"64k")
     end
-    
+
     # key 去掉 ext
     def transcode_file_path
       arr = token.split(".")
@@ -127,12 +154,19 @@ module FilePartUpload
       arr.join(".")
     end
 
-    def put_video_transcode_to_quene_by_bit_rate(video_bit_rate, audio_bit_rate)
-      fops = "avthumb/mp4/vcodec/libx264/vb/#{video_bit_rate}/acodec/libmp3lame/ab/#{audio_bit_rate}"
-      transcode_key = File.join(transcode_file_path, "#{video_bit_rate}.mp4")
+    def put_video_transcode_to_quene_by_bit_rate(options)
+      name           = options[:name]
+      video_width    = options[:video_width]
+      video_height   = options[:video_height]
+      video_bit_rate = options[:video_bit_rate]
+      audio_bit_rate = options[:audio_bit_rate]
+      resolution     = "#{video_width}x#{video_height}"
+
+      fops = "avthumb/mp4/vcodec/libx264/vb/#{video_bit_rate}/r/24/s/#{resolution}/autoscale/1/acodec/libfdk_aac/audioProfile/aac_he/ab/#{audio_bit_rate}/ar/44100"
+      transcode_key = File.join(transcode_file_path, "#{resolution}.mp4")
       fops = FilePartUpload::Util.splice_qiniu_saveas_fops_str(fops, transcode_key)
       self.transcoding_records.create(
-        :name  => "default",
+        :name  => name,
         :token => transcode_key,
         :fops      => fops
       )
@@ -160,18 +194,18 @@ module FilePartUpload
         :fops      => fops
       )
     end
-    
+
     def put_pdf_transcode_to_quene
       update_page_count_by_pdf_url(self.url)
       put_pdf_transcode_to_quene_by_page_count
     end
-    
+
     def update_page_count_by_pdf_url(pdf_url)
       json_str = RestClient.get("#{pdf_url}?yifangyun_preview/v2/action=get_page_count").body
       self.meta["page_count"] = JSON.parse(json_str)["page_count"].to_i
       self.save
     end
-    
+
     def put_pdf_transcode_to_quene_by_page_count
       transcode_key_list = []
       fops_list          = []
@@ -179,17 +213,17 @@ module FilePartUpload
         fops = "yifangyun_preview/v2/action=get_preview/format=jpg/page_number=#{num}"
         transcode_key = File.join(self.transcode_file_path, "#{num}.jpg")
         fops = FilePartUpload::Util.splice_qiniu_saveas_fops_str(fops, transcode_key)
-        
+
         transcode_key_list.push transcode_key
         fops_list.push fops
       end
-      
+
       self.transcoding_records.create(
         :name  => "jpg",
         :token => transcode_key_list,
         :fops      => fops_list.join(";")
       )
     end
-    
+
   end
 end
