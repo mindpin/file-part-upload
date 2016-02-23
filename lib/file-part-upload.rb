@@ -74,10 +74,14 @@ module FilePartUpload
       file_part_upload_config[:qiniu_audio_and_video_transcode]
     end
 
+    def get_qiniu_pfop_pipeline
+      file_part_upload_config[:qiniu_pfop_pipeline]
+    end
+
     def get_qiniu_callback_url
       File.join(get_qiniu_callback_host, get_mount_prefix, "/file_entities")
     end
-    
+
     def get_qiniu_pfop_notify_url
       File.join(get_qiniu_callback_host, get_mount_prefix, "/file_entities/pfop")
     end
