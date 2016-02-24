@@ -106,7 +106,7 @@ module FilePartUpload
       video_width    = self.meta["video"]["width"].to_i
       video_height   = self.meta["video"]["height"].to_i
 
-      video_codec_name = self.meta["video_codec_name"]
+      video_codec_name = self.meta["video"]["video_codec_name"]
 
       bit_rate_mulriples = [
         {
