@@ -97,12 +97,27 @@ module FilePartUpload
     end
 
     def put_video_transcode_to_quene
-      # TODO 需要参考 http://www.youku.com/help/view/fid/8#q20 改进的地方
-      # 1 不同编码源文件需要的视频码率不同，现在的逻辑完全按照假设源文件是 h264 编码来处理的
-      # 2 转码规则修改成配置化的
-      video_bit_rate = self.meta["video"]["video_bit_rate"].to_i
+      # 参考了 http://www.youku.com/help/view/fid/8#q20
+      # 参考了 http://www.lecloud.com/
+      # TODO 转码规则修改成配置化的
+
+      # 从七牛获取的 video_bit_rate 有时候是空，所以用 total_bit_rate 稳妥一些
+      video_bit_rate = self.meta["video"]["total_bit_rate"].to_i
       video_width    = self.meta["video"]["width"].to_i
       video_height   = self.meta["video"]["height"].to_i
+
+      video_codec_name = self.meta["video_codec_name"]
+
+      bit_rate_mulriples = [
+        {
+          video_codec_name: "mpeg4",
+          value: 2
+        },
+        {
+          video_codec_name: /mpeg1|mpeg2/,
+          value: 5
+        }
+      ]
 
       transcode_params_arr = [
         {
@@ -128,14 +143,24 @@ module FilePartUpload
         }
       ]
 
+      mulriple_hash = bit_rate_mulriples.select do |hash|
+        !video_codec_name.match(hash[:video_codec_name]).blank?
+      end[0]
+
+      if mulriple_hash.blank?
+        mulriple = 1
+      else
+        mulriple = mulriple_hash[:value]
+      end
+
       transcode_params_arr.each do |params|
-        if video_width >= params[:video_width] && video_height >= params[:video_height] && video_bit_rate >= params[:video_bit_rate]
+        if video_width >= params[:video_width] && video_height >= params[:video_height] && video_bit_rate >= params[:video_bit_rate]*mulriple
           put_video_transcode_to_quene_by_bit_rate(params)
         end
       end
 
       min_params = transcode_params_arr[0]
-      if video_width < min_params[:video_width] || video_height < min_params[:video_height] || video_bit_rate < min_params[:video_bit_rate]
+      if video_width < min_params[:video_width] || video_height < min_params[:video_height] || video_bit_rate < min_params[:video_bit_rate]*mulriple
         put_video_transcode_to_quene_by_bit_rate(
           name: "低清",
           video_width: video_width,

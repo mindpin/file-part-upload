@@ -88,6 +88,10 @@ module FilePartUpload
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ]
 
+    VIDEO_FIX_MIME_TYPE_LIST = [
+      "application/vnd.rn-realmedia"
+    ]
+
     # TODO 编写测试
     def self.get_file_kind_by_mime_type(mime_type)
       kind  = mime_type.split("/").first
@@ -95,6 +99,7 @@ module FilePartUpload
 
       return "office" if OFFICE_MIME_TYPE_LIST.include?(mime_type)
       return "pdf"    if mime_type == "application/pdf"
+      return "video"  if VIDEO_FIX_MIME_TYPE_LIST.include?(mime_type)
 
       return "application"
     end
