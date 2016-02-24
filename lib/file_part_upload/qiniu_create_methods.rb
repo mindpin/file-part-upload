@@ -44,8 +44,11 @@ module FilePartUpload
       def __get_meta_from_callback_body(mime, callback_body)
         file_size  = callback_body[:file_size]
 
-        case mime.split("/").first
-        when "image"
+        is_image = !callback_body[:image_rgb].blank?
+        is_video = !callback_body[:avinfo_video_codec_name].blank?
+        is_audio = !callback_body[:avinfo_audio_codec_name].blank? && callback_body[:avinfo_video_codec_name].blank?
+
+        if is_image
           rgb   = callback_body[:image_rgb]
           rgba  = "rgba(#{rgb[2..3].hex},#{rgb[4..5].hex},#{rgb[6..7].hex},0)"
           hex   = "##{rgb[2..7]}"
@@ -62,7 +65,9 @@ module FilePartUpload
               "width"  => width
             }
           }
-        when "video"
+        end
+
+        if is_video
           return {
             "file_size" => file_size,
             "video" => {
@@ -79,8 +84,10 @@ module FilePartUpload
               "avinfo_audio_duration" => callback_body[:avinfo_audio_duration]
             }
           }
-        when "audio"
-          {
+        end
+
+        if is_audio
+          return {
             "file_size" => file_size,
             "audio" => {
               "total_bit_rate"   => callback_body[:avinfo_total_bit_rate],
@@ -90,9 +97,9 @@ module FilePartUpload
               "audio_duration"   => callback_body[:avinfo_audio_duration]
             }
           }
-        else
-          return {"file_size" => file_size}
         end
+
+        return {"file_size" => file_size}
       end
 
 

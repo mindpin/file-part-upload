@@ -66,6 +66,12 @@ module FilePartUpload
       FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
     end
 
+    def self.qiniu_pfop_pipeline(qiniu_pfop_pipeline)
+      config = FilePartUpload.file_part_upload_config
+      config[:qiniu_pfop_pipeline] = qiniu_pfop_pipeline
+      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
+    end
+
     def self.qiniu_audio_and_video_transcode(action)
       if action.to_s == "enable"
         config = FilePartUpload.file_part_upload_config
