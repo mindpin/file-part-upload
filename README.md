@@ -1,1 +1,1 @@
-[使用说明](wiki)
+[使用说明](https://github.com/mindpin/file-part-upload/wiki)
