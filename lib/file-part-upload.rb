@@ -90,11 +90,11 @@ module FilePartUpload
     def get_dom_data
       if :qiniu == get_mode
         {
-          :mode              => get_mode,
-          :qiniu_domain      => get_qiniu_domain,
-          :qiniu_base_path   => get_qiniu_base_path,
-          :qiniu_uptoken_url => File.join(get_mount_prefix, "/file_entities/uptoken"),
-          :qiniu_callback_url => get_qiniu_callback_url
+          :mode              =>  get_mode,
+          :qiniu_domain      =>  get_qiniu_domain,
+          :qiniu_base_path   =>  get_qiniu_base_path,
+          :qiniu_uptoken_url =>  File.join(get_mount_prefix, "/file_entities/uptoken"),
+          :qiniu_callback_url => File.join(get_mount_prefix, "/file_entities")
         }
       else
         {

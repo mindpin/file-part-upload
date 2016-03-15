@@ -97,9 +97,25 @@ class FilePartUploader
 
 
   _init_qiniu: ()->
-    @qiniu_domain      = @dom_data['qiniuDomain']
-    @qiniu_base_path   = @dom_data['qiniuBasePath']
-    @qiniu_uptoken_url = @dom_data['qiniuUptokenUrl']
+    @qiniu_domain       = @dom_data['qiniuDomain']
+    @qiniu_base_path    = @dom_data['qiniuBasePath']
+    @qiniu_uptoken_url  = @dom_data['qiniuUptokenUrl']
+    @qiniu_callback_url = @dom_data['qiniuCallbackUrl']
+
+    @qiniu_all_complete_callback = =>
+      all_complete = true
+
+      for file_id, file_progress of @file_progresses
+        if !file_progress.complete
+          all_complete = false
+          break
+
+      if all_complete
+        @$file_progress.alldone()
+      else
+        setTimeout @qiniu_all_complete_callback, 100
+
+
 
     @qiniu = Qiniu.uploader
       runtimes: 'html5,flash,html4'
@@ -146,7 +162,16 @@ class FilePartUploader
         FileUploaded: (up, file, info_json)=>
           console.debug 'file uploaded'
           info = jQuery.parseJSON(info_json);
-          @file_progresses[file.id].success(info)
+          jQuery.ajax
+            type: 'POST'
+            url:  @qiniu_callback_url
+            data: info
+            success: (res)=>
+              @file_progresses[file.id].success(res)
+            error: (xhr)=>
+              @file_progresses[file.id].error()
+            complete: =>
+              @file_progresses[file.id].complete = true
 
         # 该方法在上传出错时触发
         Error: (up, err, errTip)=>
@@ -161,7 +186,7 @@ class FilePartUploader
 
         # 该方法在整个队列处理完毕后触发
         UploadComplete: =>
-          @$file_progress.alldone()
+          @qiniu_all_complete_callback()
 
     # 注册图片粘贴事件
     new PasteImage (file)=>
