@@ -15,12 +15,6 @@ module FilePartUpload
       self.instance_variable_get(:@file_part_upload_config) || {}
     end
 
-    def set_mount_prefix(mount_prefix)
-      config = FilePartUpload.file_part_upload_config
-      config[:mount_prefix] = mount_prefix
-      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
-    end
-
     def get_mode
       file_part_upload_config[:mode] || :local
     end
@@ -47,7 +41,7 @@ module FilePartUpload
     end
 
     def get_mount_prefix
-      file_part_upload_config[:mount_prefix]
+      FilePartUpload::Engine.routes.url_helpers.root_path
     end
 
     def get_qiniu_callback_host
