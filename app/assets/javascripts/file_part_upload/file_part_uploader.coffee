@@ -89,7 +89,12 @@ class FilePartUploader
 
     # 该方法在上传出错时触发
     @local_upload.bind "Error", (up, err, errTip)=>
-      @file_progresses[err.file.id].error()
+      fp = @file_progresses[err.file.id]
+      if fp and fp.error
+        console.warn("file progress 的 error 实例方法在将来的版本中将要被去除，请换用 error 类方法")
+        fp.error(up, err, errTip)
+      else
+        @$file_progress.error(up, err, errTip)
 
     # 该方法在整个队列处理完毕后触发
     @local_upload.bind "UploadComplete", =>
