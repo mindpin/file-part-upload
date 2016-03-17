@@ -2,11 +2,15 @@
 # browse_button: 上传按钮
 # dragdrop_area: 接收文件拖拽的区域
 # file_progress: 处理上传进度的回调类
+# max_file_size: 允许上传的文件大小 比如 "10mb"
+# mime_types : 允许上传的文件类型 比如 [{ title : "Image files", extensions : "jpg,gif,png" }]
 
 class FilePartUploader
   constructor: (options)->
     @$browse_button = options["browse_button"]
     @$drag_area_ele = options["dragdrop_area"]
+    @max_file_size  = options["max_file_size"] || "100mb"
+    @mime_types     = options["mime_types"] || []
     @$file_progress = options["file_progress"] || FilePartUploaderFileProgress
 
     @dom_data = @$browse_button.data()
@@ -28,7 +32,9 @@ class FilePartUploader
       runtimes: 'html5,flash,html4'
       browse_button: @$browse_button.get(0)
       url: @local_upload_url
-      max_file_size: '100mb'
+      max_file_size: @max_file_size
+      filters:
+        mime_types: @mime_types
       max_retries: 1
       drop_element: @$drag_area_ele.get(0)
       chunk_size: '4mb'
@@ -119,15 +125,17 @@ class FilePartUploader
 
     @qiniu = Qiniu.uploader
       runtimes: 'html5,flash,html4'
-      browse_button: @$browse_button.get(0),
-      uptoken_url: @qiniu_uptoken_url,
-      domain: @qiniu_domain,
-      max_file_size: '100mb',
-      max_retries: 1,
-      dragdrop: true,
-      drop_element: @$drag_area_ele.get(0),
-      chunk_size: '4mb',
-      auto_start: true,
+      browse_button: @$browse_button.get(0)
+      uptoken_url: @qiniu_uptoken_url
+      domain: @qiniu_domain
+      max_file_size: @max_file_size
+      filters:
+        mime_types: @mime_types
+      max_retries: 1
+      dragdrop: true
+      drop_element: @$drag_area_ele.get(0)
+      chunk_size: '4mb'
+      auto_start: true
       x_vars:
         original: (up, file)->
           file.name
@@ -175,7 +183,12 @@ class FilePartUploader
 
         # 该方法在上传出错时触发
         Error: (up, err, errTip)=>
-          @file_progresses[err.file.id].error()
+          fp = @file_progresses[err.file.id]
+          if fp and fp.error
+            console.warn("file progress 的 error 实例方法在将来的版本中将要被去除，请换用 error 类方法")
+            fp.error(up, err, errTip)
+          else
+            @$file_progress.error(up, err, errTip)
 
         # 同时选择多个文件时才会触发
         FilesAdded: (up, files)=>
