@@ -45,8 +45,8 @@ class @QiniuFilePartUploader
       auto_start:       true
       multi_selection:  @multi_selection
 
-      browse_button:  @$browse_button.get(0)
-      drop_element:   @$drag_area_ele.get(0)
+      browse_button:  @$browse_button?.get(0)
+      drop_element:   @$drag_area_ele?.get(0)
       dragdrop:       true
 
       filters:
