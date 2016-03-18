@@ -19,10 +19,6 @@ class @QiniuFilePartUploader
     @multi_selection      = !!options['multi_selection']
     @file_progress_class  = options["file_progress_class"] || FilePartUploaderFileProgress
 
-    @dom_data = @$browse_button.data()
-    console.debug 'browse button dom data:'
-    console.debug @dom_data
-
     # 上传进度显示对象实例集合
     @file_progress_instances = {}
 
@@ -30,10 +26,16 @@ class @QiniuFilePartUploader
     @init_paste_handle()
 
   init: ->
-    @qiniu_domain       = @dom_data['qiniuDomain']
-    @qiniu_base_path    = @dom_data['qiniuBasePath']
-    @qiniu_uptoken_url  = @dom_data['qiniuUptokenUrl']
-    @qiniu_callback_url = @dom_data['qiniuCallbackUrl']
+    dom_data = @$browse_button.data()
+    console.debug 'browse button dom data:'
+    console.debug dom_data
+    @qiniu_domain       = dom_data['qiniuDomain']
+    @qiniu_base_path    = dom_data['qiniuBasePath']
+    @qiniu_uptoken_url  = dom_data['qiniuUptokenUrl']
+    @qiniu_callback_url = dom_data['qiniuCallbackUrl']
+
+    if not (@qiniu_domain? and @qiniu_base_path? and @qiniu_uptoken_url? and @qiniu_callback_url?)
+      console.warn "需要在上传按钮的 DOM 上声明这些参数： data-qiniu-domain, data-qiniu-base-path, data-qiniu-uptoken-url, data-callback-url"
 
     @qiniu = Qiniu.uploader
       runtimes:         'html5,flash,html4'
