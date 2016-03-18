@@ -90,7 +90,9 @@ class @QiniuFilePartUploader
         # 该方法在上传成功结束时触发
         FileUploaded: (up, file, info_json)=>
           console.debug 'file uploaded, create file entity'
-          info = jQuery.parseJSON(info_json);
+          info = jQuery.parseJSON info_json
+          # 这里写个回调钩子，虽然不是很常用
+          @file_progress_instances[file.id].deal_file_entity?(info)
           jQuery.ajax
             type: 'POST'
             url:  @qiniu_callback_url
@@ -152,6 +154,13 @@ class FilePartUploaderFileProgress
   file_error: (up, err, err_tip)->
     console.log "file error"
     console.log up, err, err_tip
+
+  # 当七牛上传成功，尝试创建 file_entity 时，此方法会被调用
+  # 不是很常用，就不往文档里写了
+  # 不过确实有的 react 组件有用到
+  deal_file_entity: (info)->
+    console.log "create file entity"
+    console.log info
 
   file_entity_error: (xhr)->
     console.log "file entity error"

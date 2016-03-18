@@ -76,6 +76,7 @@ jQuery(document).on 'ready page:load', ->
       console.log "file error"
       console.log up, err, err_tip
 
+    # file entity 创建失败时，此方法会被调用
     file_entity_error: (xhr)->
       console.log "file entity error"
       console.log xhr.responseText
