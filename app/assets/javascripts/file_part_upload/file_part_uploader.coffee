@@ -112,14 +112,14 @@ class @QiniuFilePartUploader
           else
             @file_progress_class.uploader_error?(up, err, err_tip)
 
-        # 同时选择多个文件时才会触发
+        # 添加文件时就会触发
         FilesAdded: (up, files)=>
-          console.debug 'many files'
           plupload.each files, (file)=>
             if not @file_progress_instances[file.id]?
               @file_progress_instances[file.id] = new @file_progress_class(file, up)
 
         # 该方法在整个队列处理完毕后触发
+        # 目前这个钩子没什么用
         UploadComplete: =>
           # @qiniu_all_complete_callback()
 
