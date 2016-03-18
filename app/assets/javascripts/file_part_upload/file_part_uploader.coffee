@@ -220,7 +220,6 @@ class FilePartUploaderFileProgress
   constructor: (qiniu_uploading_file, @uploader)->
     @file = qiniu_uploading_file
     console.log @file
-    window.afile = @file
 
   # 上传进度进度更新时调用此方法
   update: ->

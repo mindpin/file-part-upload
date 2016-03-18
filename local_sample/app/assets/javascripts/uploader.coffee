@@ -3,7 +3,6 @@ jQuery(document).on 'ready page:load', ->
     constructor: (uploading_file, @uploader)->
       @file = uploading_file
       console.log @file
-      window.afile = @file
 
     # 上传进度进度更新时调用此方法
     update: ->
