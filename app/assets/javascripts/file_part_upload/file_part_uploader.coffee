@@ -34,7 +34,7 @@ class @QiniuFilePartUploader
     @qiniu_uptoken_url  = dom_data['qiniuUptokenUrl']
     @qiniu_callback_url = dom_data['qiniuCallbackUrl']
 
-    if not (@qiniu_domain? and @qiniu_base_path? and @qiniu_uptoken_url? and @qiniu_callback_url?)
+    if not (@qiniu_domain and @qiniu_base_path and @qiniu_uptoken_url and @qiniu_callback_url)
       console.warn "需要在上传按钮的 DOM 上声明这些参数： data-qiniu-domain, data-qiniu-base-path, data-qiniu-uptoken-url, data-callback-url"
 
     @qiniu = Qiniu.uploader
@@ -76,22 +76,22 @@ class @QiniuFilePartUploader
         UploadProgress: (up, file)=>
           console.debug 'upload progress'
           chunk_size = plupload.parseSize up.getOption('chunk_size')
-          @file_progress_instances[file.id].update()
+          @file_progress_instances[file.id].update?()
           # 当前进度 #{file.percent}%，
           # 速度 #{up.total.bytesPerSec}，
 
         # 该方法在上传成功结束时触发
         FileUploaded: (up, file, info_json)=>
-          console.debug 'file uploaded'
+          console.debug 'file uploaded, create file entity'
           info = jQuery.parseJSON(info_json);
           jQuery.ajax
             type: 'POST'
             url:  @qiniu_callback_url
             data: info
             success: (res)=>
-              @file_progress_instances[file.id].success(res)
+              @file_progress_instances[file.id].success?(res)
             error: (xhr)=>
-              @file_progress_instances[file.id].error()
+              @file_progress_instances[file.id].file_entity_error?(xhr)
             complete: =>
               delete @file_progress_instances[file.id]
               if Object.keys(@file_progress_instances).length is 0
@@ -101,9 +101,9 @@ class @QiniuFilePartUploader
         Error: (up, err, err_tip)=>
           fp = @file_progress_instances[err.file.id]
           if fp?
-            fp.file_error(up, err, err_tip)
+            fp.file_error?(up, err, err_tip)
           else
-            @file_progress_class.uploader_error(up, err, err_tip)
+            @file_progress_class.uploader_error?(up, err, err_tip)
 
         # 同时选择多个文件时才会触发
         FilesAdded: (up, files)=>
@@ -145,6 +145,10 @@ class FilePartUploaderFileProgress
   file_error: (up, err, err_tip)->
     console.log "file error"
     console.log up, err, err_tip
+
+  file_entity_error: (xhr)->
+    console.log "file entity error"
+    console.log xhr.responseText
 
   # 出现全局错误时（如文件大小超限制，文件类型不对），此方法会被调用
   @uploader_error: (up, err, err_tip)->
