@@ -34,6 +34,13 @@ class @QiniuFilePartUploader
     @qiniu_uptoken_url  = dom_data['qiniuUptokenUrl']
     @qiniu_callback_url = dom_data['qiniuCallbackUrl']
 
+    console.debug {
+      'qiniu_domain':       @qiniu_domain
+      'qiniu_base_path':    @qiniu_base_path
+      'qiniu_uptoken_url':  @qiniu_uptoken_url
+      'qiniu_callback_url': @qiniu_callback_url
+    }
+
     if not (@qiniu_domain and @qiniu_base_path and @qiniu_uptoken_url and @qiniu_callback_url)
       console.warn "需要在上传按钮的 DOM 上声明这些参数： data-qiniu-domain, data-qiniu-base-path, data-qiniu-uptoken-url, data-callback-url"
 
