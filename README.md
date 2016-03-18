@@ -93,7 +93,7 @@ if jQuery('.btn-upload').length
   $browse_button = jQuery('.btn-upload')
   $dragdrop_area = jQuery(document.body)
 
-  new FilePartUploader
+  new QiniuFilePartUploader
     browse_button: $browse_button
     dragdrop_area: $dragdrop_area
     file_progress: QiniuFileProgress
