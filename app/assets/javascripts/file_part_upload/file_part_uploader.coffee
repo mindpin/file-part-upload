@@ -11,6 +11,8 @@
 
 class @QiniuFilePartUploader
   constructor: (options)->
+    @debug = options['debug']
+
     @$browse_button       = options['browse_button']
     @$drag_area_ele       = options['dragdrop_area']
     @max_file_size        = options['max_file_size'] || '100mb'
@@ -27,19 +29,23 @@ class @QiniuFilePartUploader
 
   init: ->
     dom_data = @$browse_button.data()
-    console.debug 'browse button dom data:'
-    console.debug dom_data
+
+    if @debug
+      console.debug 'browse button dom data:'
+      console.debug dom_data
+    
     @qiniu_domain       = dom_data['qiniuDomain']
     @qiniu_base_path    = dom_data['qiniuBasePath']
     @qiniu_uptoken_url  = dom_data['qiniuUptokenUrl']
     @qiniu_callback_url = dom_data['qiniuCallbackUrl']
 
-    console.debug {
-      'qiniu_domain':       @qiniu_domain
-      'qiniu_base_path':    @qiniu_base_path
-      'qiniu_uptoken_url':  @qiniu_uptoken_url
-      'qiniu_callback_url': @qiniu_callback_url
-    }
+    if @debug
+      console.debug {
+        'qiniu_domain':       @qiniu_domain
+        'qiniu_base_path':    @qiniu_base_path
+        'qiniu_uptoken_url':  @qiniu_uptoken_url
+        'qiniu_callback_url': @qiniu_callback_url
+      }
 
     if not (@qiniu_domain and @qiniu_base_path and @qiniu_uptoken_url and @qiniu_callback_url)
       console.warn "需要在上传按钮的 DOM 上声明这些参数： data-qiniu-domain, data-qiniu-base-path, data-qiniu-uptoken-url, data-callback-url"
@@ -75,13 +81,15 @@ class @QiniuFilePartUploader
 
         # 该方法第二个被触发
         BeforeUpload: (up, file)=>
-          console.debug 'before upload'
+          if @debug
+            console.debug 'before upload'
           if not @file_progress_instances[file.id]?
             @file_progress_instances[file.id] = new @file_progress_class(file, up)
 
         # 该方法第三个被触发，上传结束前持续被触发
         UploadProgress: (up, file)=>
-          console.debug 'upload progress'
+          if @debug
+            console.debug 'upload progress'
           chunk_size = plupload.parseSize up.getOption('chunk_size')
           @file_progress_instances[file.id].update?()
           # 当前进度 #{file.percent}%，
@@ -89,7 +97,8 @@ class @QiniuFilePartUploader
 
         # 该方法在上传成功结束时触发
         FileUploaded: (up, file, info_json)=>
-          console.debug 'file uploaded, create file entity'
+          if @debug
+            console.debug 'file uploaded, create file entity'
           info = jQuery.parseJSON info_json
           # 这里写个回调钩子，虽然不是很常用
           @file_progress_instances[file.id].deal_file_entity?(info)
