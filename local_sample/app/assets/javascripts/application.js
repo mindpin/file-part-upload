@@ -13,5 +13,5 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
-//= require file_part_upload/application
+//= require file_part_upload/private_application
 //= require uploader

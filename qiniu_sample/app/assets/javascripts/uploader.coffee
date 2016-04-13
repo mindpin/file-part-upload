@@ -45,5 +45,5 @@ jQuery(document).on 'ready page:load', ->
       multi_selection: true
       enable_paste: true
       # 可以使用如下参数
-      # max_file_size: "10mb"
+      max_file_size: "1000mb"
       # mime_types : [{ title : "Image files", extensions : "jpg,gif,png" }]
