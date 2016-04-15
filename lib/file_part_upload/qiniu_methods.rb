@@ -46,7 +46,7 @@ module FilePartUpload
 
     def seconds
       return 0 if !self.kind.audio? && !self.kind.video?
-      meta[self.kind.to_s]["total_duration"].to_i
+      meta.try(:[], self.kind.to_s).try(:[], "total_duration").to_i
     end
 
     def file_size
