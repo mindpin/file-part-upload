@@ -16,7 +16,7 @@ module FilePartUpload
     end
 
     def get_mode
-      file_part_upload_config[:mode] || :local
+      file_part_upload_config[:mode] || :qiniu
     end
 
     def get_path
@@ -90,11 +90,6 @@ module FilePartUpload
           :qiniu_uptoken_url =>  File.join(get_mount_prefix, "/file_entities/uptoken"),
           :qiniu_callback_url => File.join(get_mount_prefix, "/file_entities")
         }
-      else
-        {
-          :mode             => get_mode,
-          :local_upload_url => File.join(get_mount_prefix, "/file_entities/upload")
-        }
       end
 
     end
@@ -104,27 +99,16 @@ module FilePartUpload
 end
 
 require 'enumerize'
-require 'streamio-ffmpeg'
-require "mini_magick"
 # 引用 rails engine
 require 'file_part_upload/engine'
-require 'file_part_upload/mini_magick'
-require 'file_part_upload/office_methods'
-require 'file_part_upload/local_validate'
-require 'file_part_upload/local_callback'
-require 'file_part_upload/local_methods'
-require 'file_part_upload/local_path_util'
 
-require 'file_part_upload/upload_file'
 require 'file_part_upload/util'
 require 'file_part_upload/error'
 require 'file_part_upload/file_entity'
 require 'file_part_upload/config'
-require 'file_part_upload/office_helper'
 
 require 'file_part_upload/module_loader'
 
-require "file_part_upload/local_controller_methods"
 require "file_part_upload/qiniu_controller_methods"
 
 require 'file_part_upload/qiniu_validate'

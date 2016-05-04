@@ -45,13 +45,12 @@ module FilePartUpload
       self.meta = {} if self.meta.blank?
       self.meta["file_size"] = file_size.to_i
     end
-    
+
     KINDS.each do |kind_sym|
       define_method "is_#{kind_sym}?" do
         self.kind.to_s == kind_sym.to_s
       end
     end
 
-    include FilePartUpload::OfficeMethods
   end
 end

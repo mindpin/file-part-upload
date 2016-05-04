@@ -3,7 +3,6 @@ require 'rails_helper'
 describe 'qiniu mode' do
   before{
     FilePartUpload.config do
-      path '/f/:name'
       mode :qiniu
 
       qiniu_bucket    "fushang318"

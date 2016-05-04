@@ -4,21 +4,9 @@ module FilePartUpload
       self.instance_eval &block
     end
 
-    def self.path(str)
-      config = FilePartUpload.file_part_upload_config
-      config[:path] = str
-      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
-    end
-
-    def self.url(str)
-      config = FilePartUpload.file_part_upload_config
-      config[:url] = str
-      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
-    end
-
     def self.mode(str)
       sym = str.to_sym
-      raise "mode 只支持 :local 或 :qiniu" if ![:qiniu, :local].include?(sym)
+      raise "mode 只支持 :qiniu" if ![:qiniu].include?(sym)
       config = FilePartUpload.file_part_upload_config
       config[:mode] = sym
       FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
@@ -81,7 +69,6 @@ module FilePartUpload
     end
 
     def self.image_version(version_name, &block)
-      self._local_image_version(version_name, &block)
       self._qiniu_image_version(version_name, &block)
     end
 
@@ -90,18 +77,6 @@ module FilePartUpload
       config[:qiniu_image_versions] ||= {}
       process_type, process_args = self.instance_eval &block
       config[:qiniu_image_versions][version_name.to_s] = {
-        :type => process_type.to_s,
-        :args => process_args
-      }
-      FilePartUpload.instance_variable_set(:@file_part_upload_config, config)
-    end
-
-    def self._local_image_version(version_name, &block)
-      config = FilePartUpload.file_part_upload_config
-      config[:image_versions] ||= []
-      process_type, process_args = self.instance_eval &block
-      config[:image_versions] << {
-        :name => version_name.to_s,
         :type => process_type.to_s,
         :args => process_args
       }

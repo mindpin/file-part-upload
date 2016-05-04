@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'local http api', :type => :feature do
+describe 'upload http api', :type => :feature do
   before{
     FilePartUpload.config do
       mode :qiniu
