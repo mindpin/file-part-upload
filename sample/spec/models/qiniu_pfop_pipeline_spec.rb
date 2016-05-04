@@ -5,7 +5,6 @@ describe 'get_qiniu_pfop_pipeline' do
       expect(FilePartUpload.get_qiniu_pfop_pipeline).to eq(nil)
 
       FilePartUpload.config do
-        path '/f/:name'
         mode :qiniu
 
         qiniu_bucket    "fushang318"

@@ -18,7 +18,6 @@ describe 'qiniu_audio_and_video_transcode' do
 
 
     FilePartUpload.config do
-      path '/f/:name'
       mode :qiniu
 
       qiniu_bucket    "fushang318"
@@ -98,14 +97,14 @@ describe 'qiniu_audio_and_video_transcode' do
     expect(@file_entity_video.is_audio?).to eq(false)
     expect(@file_entity_video.is_video?).to eq(true)
 
-    expect(@file_entity_video.transcode_info).to eq({"default"=>"processing"})
+    expect(@file_entity_video.transcode_info).to eq({"标清"=>"processing"})
     expect(@file_entity_video.transcode_success?).to eq(false)
-    
+
     @file_entity_video.transcoding_records.each do |tr|
       tr.refresh_status_form_qiniu
     end
-    
-    expect(@file_entity_video.transcode_info).to eq({"default"=>"success"})
+
+    expect(@file_entity_video.transcode_info).to eq({"标清"=>"success"})
     expect(@file_entity_video.transcode_success?).to eq(true)
   }
 
@@ -117,11 +116,11 @@ describe 'qiniu_audio_and_video_transcode' do
 
     expect(@file_entity_audio.transcode_info).to eq({"default"=>"processing"})
     expect(@file_entity_audio.transcode_success?).to eq(false)
-    
+
     @file_entity_audio.transcoding_records.each do |tr|
       tr.refresh_status_form_qiniu
     end
-    
+
     expect(@file_entity_audio.transcode_info).to eq({"default"=>"success"})
     expect(@file_entity_audio.transcode_success?).to eq(true)
   }
