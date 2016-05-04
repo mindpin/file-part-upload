@@ -210,4 +210,29 @@ end
 访问 `http://<host>/<file_part_upload_engine_prefix>/file_entities/:id`
 
 # 用 qiniu + 本地兼容模式作为后台存储的使用说明
-请看 https://github.com/mindpin/kc_file_upload 的 README
+[kc_file_upload](https://github.com/mindpin/kc_file_upload) 是一个兼容 qiniu 上传 api 的 server 端实现  
+在不能使用 qiniu 服务的情况下，可以用其来代替 qiniu 服务，作为接收文件上传的服务端。不过目前不支持视频转码等功能
+
+使用需要额外增加如下的一些配置
+
+1 配置环境变量 lan_qiniu_compatibility_mode_upload_url  
+
+建议使用 figaro gem 在 application.yml 中配置  
+```
+# 设置的值为 kc_file_upload 的访问地址
+lan_qiniu_compatibility_mode_upload_url: http://up.kc_file_upload.com
+```
+
+
+2 在 `app/views/layouts/application.html.haml` 中， stylesheet_link_tag 和 javascript_include_tag 这两行的前面增加几行内容
+```
+- if !ENV["lan_qiniu_compatibility_mode_upload_url"].blank?
+  :javascript
+    window.use_lan_qiniu_compatibility_mode = true
+    window.lan_qiniu_compatibility_mode_upload_url = "#{ENV['lan_qiniu_compatibility_mode_upload_url']}"
+
+= stylesheet_link_tag :application, :'data-turbolinks-track' => true
+= javascript_include_tag :application, :'data-turbolinks-track' => true
+```
+
+
