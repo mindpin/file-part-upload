@@ -4,6 +4,10 @@ module FilePartUpload
     include Mongoid::Timestamps
     extend Enumerize
 
+    include FilePartUpload::QiniuValidate
+    include FilePartUpload::QiniuCreateMethods
+    include FilePartUpload::QiniuMethods
+
     # 原始文件名
     field :original, type: String
     # content_type
