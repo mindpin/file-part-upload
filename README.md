@@ -208,3 +208,6 @@ end
 
 ## 查看文件详情页面
 访问 `http://<host>/<file_part_upload_engine_prefix>/file_entities/:id`
+
+# 用 qiniu + 本地兼容模式作为后台存储的使用说明
+请看 https://github.com/mindpin/kc_file_upload 的 README
