@@ -235,4 +235,12 @@ lan_qiniu_compatibility_mode_upload_url: http://up.kc_file_upload.com
 = javascript_include_tag :application, :'data-turbolinks-track' => true
 ```
 
+# postgresql 如何使用方法
+## migrate
+```
+# 生成所需数据表
+rails g active_record:file_part_upload whatever
+rake db:migrate
+```
 
+其余使用方法同上
