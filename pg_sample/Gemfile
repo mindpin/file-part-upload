@@ -1,6 +1,5 @@
 source 'https://ruby.taobao.org'
 
-
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.3'
 # Use SCSS for stylesheets
@@ -30,26 +29,28 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
-gem 'web-console', group: :development
-
-group :development, :test do
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug'
-end
-
-
 # 更友好的出错页面
 group :test, :development do
   gem 'better_errors'
   gem 'binding_of_caller'
+
+  gem 'byebug'
+  gem 'rspec-rails', '~> 3.0'
 end
 
-gem 'mongoid', '~> 4.0.2'
-gem 'haml'
-gem 'figaro', '>= 1.0.0'
+group :development do
+  # Access an IRB console on exception pages or by using <%= console %> in views
+  gem 'web-console', '~> 2.0'
+end
 
-gem 'play_auth', :github => 'mindpin/play_auth',
-                 :tag => :latest
+group :test do
+  gem 'database_cleaner', '~> 1.4.1'
+  gem "factory_girl_rails"
+  gem 'capybara'
+end
+
+# Use postgresql as the database for Active Record
+gem 'pg'
+gem 'haml'
 
 gem 'file-part-upload', path: '../'
-gem 'bootstrap-sass', '~> 3.3.5'
