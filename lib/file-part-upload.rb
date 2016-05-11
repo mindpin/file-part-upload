@@ -1,4 +1,34 @@
 module FilePartUpload
+  DEFAULT_VIDEO_TRANSCODE_PARAMS = [
+    {
+      name: "原画",# 源画质
+      video_width: nil,
+      video_height: nil,
+      video_bit_rate: nil,
+      audio_bit_rate: 32000
+    },
+    {
+      name: "超请",
+      video_width: 1280,
+      video_height: 720,
+      video_bit_rate: 921600,
+      audio_bit_rate: 64000
+    },
+    {
+      name: "高清",
+      video_width: 960,
+      video_height: 540,
+      video_bit_rate: 518400,
+      audio_bit_rate: 32000
+    },
+    {
+      name: "标清",
+      video_width:    640,
+      video_height:   360,
+      video_bit_rate: 230400,
+      audio_bit_rate: 32000
+    }
+  ]
 
   class << self
     def config(&block)
@@ -58,6 +88,10 @@ module FilePartUpload
 
     def get_qiniu_audio_and_video_transcode
       file_part_upload_config[:qiniu_audio_and_video_transcode]
+    end
+
+    def get_qiniu_video_transcode_params
+      file_part_upload_config[:qiniu_video_transcode_params] || DEFAULT_VIDEO_TRANSCODE_PARAMS
     end
 
     def get_qiniu_pfop_pipeline
