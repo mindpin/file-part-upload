@@ -97,14 +97,14 @@ describe 'qiniu_audio_and_video_transcode' do
     expect(@file_entity_video.is_audio?).to eq(false)
     expect(@file_entity_video.is_video?).to eq(true)
 
-    expect(@file_entity_video.transcode_info).to eq({"标清"=>"processing"})
+    expect(@file_entity_video.transcode_info).to eq({"原画"=>"processing", "标清"=>"processing"})
     expect(@file_entity_video.transcode_success?).to eq(false)
 
     @file_entity_video.transcoding_records.each do |tr|
       tr.refresh_status_form_qiniu
     end
 
-    expect(@file_entity_video.transcode_info).to eq({"标清"=>"success"})
+    expect(@file_entity_video.transcode_info).to eq({"原画"=>"success", "标清"=>"success"})
     expect(@file_entity_video.transcode_success?).to eq(true)
   }
 

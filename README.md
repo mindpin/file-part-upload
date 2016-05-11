@@ -5,7 +5,7 @@
 ```ruby
 gem 'file-part-upload',
   :github => "mindpin/file-part-upload",
-  :tag    => "3.0.0"
+  :tag    => "3.1.0"
 ```
 
 ## 基础配置
@@ -203,6 +203,34 @@ end
 file_entity.transcoding_records.each do |transcoding_record|
   transcoding_record.name
   transcoding_record.url
+end
+```
+
+## 自定义视频转码码率参数
+自定义三个档位的转码参数，当原视频的分辨率和音视频码率都大于定义的档位参数时，就会进行对应档位的转码
+```ruby
+FilePartUpload.config do
+  qiniu_video_transcode_params([
+    {
+      # 如果定义的档位不具体指定分辨率和视频码率，这样就会使用原视频参数
+      name: "原画",
+      audio_bit_rate: 32000
+    },
+    {
+      name: "标清",
+      video_width:    640,
+      video_height:   360,
+      video_bit_rate: 230400,
+      audio_bit_rate: 32000
+    },
+    {
+      name: "高清",
+      video_width: 960,
+      video_height: 540,
+      video_bit_rate: 518400,
+      audio_bit_rate: 32000
+    }
+  ])
 end
 ```
 

@@ -1,5 +1,20 @@
 module FilePartUpload
   module QiniuMethods
+    VIDEO_BIT_RATE_MULRIPLES = [
+      {
+        video_codec_name: "mpeg4",
+        value: 2
+      },
+      {
+        video_codec_name: /mpeg1|mpeg2/,
+        value: 5
+      },
+      {
+        video_codec_name: /.*/,
+        value: 1
+      }
+    ]
+
     def self.included(base)
       base.has_many :transcoding_records, :class_name => "FilePartUpload::TranscodingRecord"
       base.after_create :process_transcode
@@ -99,7 +114,6 @@ module FilePartUpload
     def put_video_transcode_to_quene
       # 参考了 http://www.youku.com/help/view/fid/8#q20
       # 参考了 http://www.lecloud.com/
-      # TODO 转码规则修改成配置化的
 
       # 从七牛获取的 video_bit_rate 有时候是空，所以用 total_bit_rate 稳妥一些
       video_bit_rate = self.meta["video"]["total_bit_rate"].to_i
@@ -108,66 +122,20 @@ module FilePartUpload
 
       video_codec_name = self.meta["video"]["video_codec_name"]
 
-      bit_rate_mulriples = [
-        {
-          video_codec_name: "mpeg4",
-          value: 2
-        },
-        {
-          video_codec_name: /mpeg1|mpeg2/,
-          value: 5
-        }
-      ]
-
-      transcode_params_arr = [
-        {
-          name: "标清",
-          video_width:    640,
-          video_height:   360,
-          video_bit_rate: 230400,
-          audio_bit_rate: 32000
-        },
-        {
-          name: "高清",
-          video_width: 960,
-          video_height: 540,
-          video_bit_rate: 518400,
-          audio_bit_rate: 32000
-        },
-        {
-          name: "超请",
-          video_width: 1280,
-          video_height: 720,
-          video_bit_rate: 921600,
-          audio_bit_rate: 64000
-        }
-      ]
-
-      mulriple_hash = bit_rate_mulriples.select do |hash|
+      mulriple = VIDEO_BIT_RATE_MULRIPLES.select do |hash|
         !video_codec_name.match(hash[:video_codec_name]).blank?
-      end[0]
+      end[0][:value]
 
-      if mulriple_hash.blank?
-        mulriple = 1
-      else
-        mulriple = mulriple_hash[:value]
-      end
+      transcode_params = FilePartUpload.get_qiniu_video_transcode_params
+      transcode_params.each do |params|
+        params = params.symbolize_keys
+        params[:video_width]    ||= video_width
+        params[:video_height]   ||= video_height
+        params[:video_bit_rate] ||= video_bit_rate
 
-      transcode_params_arr.each do |params|
         if video_width >= params[:video_width] && video_height >= params[:video_height] && video_bit_rate >= params[:video_bit_rate]*mulriple
           put_video_transcode_to_quene_by_bit_rate(params)
         end
-      end
-
-      min_params = transcode_params_arr[0]
-      if video_width < min_params[:video_width] || video_height < min_params[:video_height] || video_bit_rate < min_params[:video_bit_rate]*mulriple
-        put_video_transcode_to_quene_by_bit_rate(
-          name: "低清",
-          video_width: video_width,
-          video_height: video_height,
-          video_bit_rate: video_bit_rate,
-          audio_bit_rate: 32000
-        )
       end
 
     end
@@ -185,7 +153,7 @@ module FilePartUpload
       video_height   = options[:video_height]
       video_bit_rate = options[:video_bit_rate]
       audio_bit_rate = options[:audio_bit_rate]
-      resolution     = "#{video_width}x#{video_height}"
+      resolution     = "#{video_width}x#{video_height}_#{video_bit_rate}_#{audio_bit_rate}"
 
       fops = "avthumb/mp4/vcodec/libx264/vb/#{video_bit_rate}/r/24/s/#{resolution}/autoscale/1/acodec/libfdk_aac/audioProfile/aac_he/ab/#{audio_bit_rate}/ar/44100"
       transcode_key = File.join(transcode_file_path, "#{resolution}.mp4")
