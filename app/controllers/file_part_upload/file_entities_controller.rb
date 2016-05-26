@@ -56,7 +56,8 @@ module FilePartUpload
       file_entity = FilePartUpload::FileEntity.from_qiniu_callback_body(params)
       render json: {
         :file_entity_id  => file_entity.id.to_s,
-        :file_entity_url => file_entity.url
+        :file_entity_url => file_entity.url,
+        :download_url    => file_entity.download_url
       }
     end
 
