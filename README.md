@@ -5,7 +5,7 @@
 ```ruby
 gem 'file-part-upload',
   :github => "mindpin/file-part-upload",
-  :tag    => "3.1.0"
+  :tag    => "3.2.0"
 ```
 
 ## 基础配置
