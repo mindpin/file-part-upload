@@ -7,6 +7,8 @@ FilePartUpload.config do
   qiniu_app_access_key ENV["QINIU_APP_ACCESS_KEY"]
   qiniu_app_secret_key ENV["QINIU_APP_SECRET_KEY"]
   qiniu_callback_host  ENV["QINIU_CALLBACK_HOST"]
-  
+
   qiniu_audio_and_video_transcode :enable
+
+  qiniu_video_transcode_params JSON.parse(ENV["QINIU_VIDEO_TRANSCODE_PARAMS"].gsub("=>",":"))
 end
