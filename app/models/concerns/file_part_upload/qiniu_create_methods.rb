@@ -1,11 +1,8 @@
 module FilePartUpload
   module QiniuCreateMethods
-    def self.included(base)
-      base.send(:extend, ClassMethods)
-    end
+    extend ActiveSupport::Concern
 
-    module ClassMethods
-
+    class_methods do
       # { "bucket"=>"fushang318",
       #   "token"=>"/i/yscPYbwk.jpeg",
       #   "file_size"=>"3514",
@@ -27,17 +24,27 @@ module FilePartUpload
       #   "avinfo_audio_duration"   => ""
       # }
       def from_qiniu_callback_body(callback_body)
+
         qiniu_base_path = FilePartUpload.get_qiniu_base_path
 
         callback_body[:file_size] = callback_body[:file_size].to_i
         meta = __get_meta_from_callback_body(callback_body[:mime], callback_body)
 
-        FilePartUpload::FileEntity.create!(
-          original: callback_body[:original],
-          token:    callback_body[:token],
-          mime:     callback_body[:mime],
-          meta: meta
-        )
+        if defined? ::ActiveRecord::Base
+          FilePartUpload::FileEntity.create!(
+            original: callback_body[:original],
+            token:    callback_body[:token],
+            mime:     callback_body[:mime],
+            meta: meta.to_json
+          )
+        else
+          FilePartUpload::FileEntity.create!(
+            original: callback_body[:original],
+            token:    callback_body[:token],
+            mime:     callback_body[:mime],
+            meta: meta
+          )
+        end
       end
 
 

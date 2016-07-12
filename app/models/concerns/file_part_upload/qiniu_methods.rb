@@ -64,10 +64,6 @@ module FilePartUpload
       meta.try(:[], self.kind.to_s).try(:[], "total_duration").to_i
     end
 
-    def file_size
-      meta["file_size"]
-    end
-
     def url(version = nil)
       base_url = File.join(FilePartUpload.get_qiniu_domain, token)
 
@@ -116,11 +112,16 @@ module FilePartUpload
       # 参考了 http://www.lecloud.com/
 
       # 从七牛获取的 video_bit_rate 有时候是空，所以用 total_bit_rate 稳妥一些
-      video_bit_rate = self.meta["video"]["total_bit_rate"].to_i
-      video_width    = self.meta["video"]["width"].to_i
-      video_height   = self.meta["video"]["height"].to_i
+      if defined? ::ActiveRecord::Base
+        json = meta_json
+      else
+        json = meta
+      end
+      video_bit_rate = json["video"]["total_bit_rate"].to_i
+      video_width    = json["video"]["width"].to_i
+      video_height   = json["video"]["height"].to_i
 
-      video_codec_name = self.meta["video"]["video_codec_name"]
+      video_codec_name = json["video"]["video_codec_name"]
 
       mulriple = VIDEO_BIT_RATE_MULRIPLES.select do |hash|
         !video_codec_name.match(hash[:video_codec_name]).blank?
