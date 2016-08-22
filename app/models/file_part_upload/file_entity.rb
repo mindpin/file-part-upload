@@ -50,8 +50,13 @@ module FilePartUpload
       self.meta["file_size"] = file_size.to_i
     end
 
+    PPT_MIMES = %w[
+      application/vnd.openxmlformats-officedocument.presentationml.presentation
+      application/vnd.ms-powerpoint
+    ]
+
     def ppt?
-      mime == "application/vnd.ms-powerpoint"
+      PPT_MIMES.include? mime
     end
 
     KINDS.each do |kind_sym|
